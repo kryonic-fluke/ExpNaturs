@@ -1,8 +1,11 @@
 const express = require('express');
 const app = express(); //this function will add bunch of method to app var
 const fs = require('fs');
+const morgan = require('morgan');
 
 const port = 3000;
+//1) Middleware
+app.use(morgan('dev')); //gives the info about the request in the console
 app.use(express.json()); //this is the midddle ware that can modify the incoming data, it stands between req and res , data from the body(property of a req) is added to it
 
 app.use((req, res, next) => {
@@ -13,17 +16,11 @@ app.use((req, res, next) => {
 
 //the routehandler before middleware sends the response, ending the req res cycle , so the next middleware in the stack after that does not get called.
 
-// app.get('/', (req, res) => {
-//          res.status(200).json({message :"helloe from the server side",app:"Natours"})                           //get is the http method  ,  specifing what to do when this url is hit
-// });
-// app.post("/" ,(req,res)=>{
-//     res.send("You can post to this endPoint...")
-// })
-
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
+//2) Route handlers------------------------------
 const getAllTours = (req, res) => {
   //can ccreate new cersion of api to do some changes , function is called a route handler
   res.status(200).json({
@@ -123,7 +120,7 @@ const DeleteTour = (req, res) => {
 };
 
 // ----------------------------------------------------------------------
-
+//3) Routes
 // app.get('/api/v1/tours/', getAllTours);
 // app.get('/api/v1/tours/:id', getATour);
 // app.post('/api/v1/tours/',CreateNewTour); // res.send('Done'); //this is received by the client after it posts;
@@ -132,14 +129,62 @@ const DeleteTour = (req, res) => {
 
 // =------------=-=-========================-=------------=-=
 // New way of writing
+const tourRouter = express.Router();
 
-app.route('/api/v1/tours').get(getAllTours).post(CreateNewTour);
+app.use('/api/v1/tours', tourRouter); //tourRouter is a middleware that will be ued for the speacified route
+//request goes into middleaware stack, and matches the specified url, then function will run
 
-app
-  .route('/api/v1/tours/:id')
+tourRouter.route('/').get(getAllTours).post(CreateNewTour);
+tourRouter //its a middlware
+  .route('/:id')
   .patch(UpdateTour)
-  .delete(DeleteTour)
+  .delete(DeleteTour) 
   .get(getATour);
+
+const useRouter = express.Router();
+
+app.use('/api/v1/users', useRouter);
+
+useRouter.route('/').get(getAllUsers).post(createUsers);
+
+useRouter.route('/:id').get(getAuser).patch(UpdateUser).delete(deleteUser);
+
+const getAllUsers = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+
+const createUsers = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+
+const getAuser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+
+const UpdateUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+// ----------------------------------------------
+// starting the Serverm
 
 app.listen(port, () => {
   //this is a callback function that will start as soonn as the server gets the request
