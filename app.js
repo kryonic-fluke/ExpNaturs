@@ -3,6 +3,16 @@ const app = express(); //this function will add bunch of method to app var
 const fs = require('fs');
 
 const port = 3000;
+app.use(express.json()); //this is the midddle ware that can modify the incoming data, it stands between req and res , data from the body(property of a req) is added to it
+
+app.use((req, res, next) => {
+  //this middleware is applied to each request that comes after it
+  console.log('hello from the middleware 😊');
+  next(); //if we didn't call the next  the req response cycle will be stuck
+});
+
+//the routehandler before middleware sends the response, ending the req res cycle , so the next middleware in the stack after that does not get called.
+
 // app.get('/', (req, res) => {
 //          res.status(200).json({message :"helloe from the server side",app:"Natours"})                           //get is the http method  ,  specifing what to do when this url is hit
 // });
@@ -51,8 +61,6 @@ const getATour = (req, res) => {
 };
 
 //-----------------------------------------------------------
-
-app.use(express.json()); //this is the midddle ware that can modify the incoming data, it stands between req and res , data from the body(property of a req) is added to it
 
 const CreateNewTour = (req, res) => {
   //with post request the data is sent by client to the server,req object hold the data about the request done

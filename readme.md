@@ -63,6 +63,22 @@ Client handles state management
 
 Corrections and Improvements:
 
-Corrected some minor spelling and formatting
-Structured the information for better readability
-Maintained the core technical content
+
+
+-------------------------------------------------------------------
+
+Express development: the request response cycle 
+
+Incoming request : for a rececived request  a request and a response object is created , in order to process the data middle ware is used , which can modify the data before sending a response 
+
+ All the middlewware that is used is called a middleware stack 
+ order of execution of middleware depends in there position in the code , it is fcfs
+
+request  a request and a response object passes through each middleware , there is a next() in middle ware , this function will be executed with exact same request and response object
+
+
+last middle ware is route handler , that next is not called here 
+
+then the request response cycle is over
+
+
