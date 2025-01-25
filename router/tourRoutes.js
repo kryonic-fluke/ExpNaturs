@@ -1,13 +1,12 @@
 
 const express = require('express')
+const {getAllTours,getATour,UpdateTour,DeleteTour,CreateNewTour, checkId} = require("./../controlers/tourControlers")
 const fs = require('fs');
+
+
 const router = express.Router();
-const {getAllTours,getATour,UpdateTour,DeleteTour,CreateNewTour} = require("./../controlers/tourControlers")
 
-
-
-
-
+router.param("id",checkId)
 
 router.route('/').get(getAllTours).post(CreateNewTour);
 router //its a middlware

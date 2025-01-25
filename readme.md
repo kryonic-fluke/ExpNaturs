@@ -83,5 +83,8 @@ then the request response cycle is over
 
 ------------
 third party midleware function  morgan (allows to see reqeust in the console)
+=======================================================================
+special type of middleware : param middleware
 
+that only runs for certain parameter
 

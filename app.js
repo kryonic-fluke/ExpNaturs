@@ -4,7 +4,6 @@ const morgan = require('morgan');
 const userRouter = require('./router/userRoutes');
 const tourRouter = require('./router/tourRoutes');
 
-const port = 3000;
 
 // 1) Middleware
 app.use(morgan('dev')); // gives the info about the request in the console
@@ -24,8 +23,5 @@ app.use('/api/v1/tours', tourRouter); // tourRouter is a middleware that will be
 // request goes into middleware stack, and matches the specified url, then function will run
 app.use('/api/v1/users', userRouter);
 
-// Starting the Server
-app.listen(port, () => {
-  // this is a callback function that will start as soon as the server gets the request
-  console.log(`app running on port ${port}...`);
-});
+
+module.exports =app
