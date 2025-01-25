@@ -16,9 +16,21 @@ const tours = JSON.parse(
           "Can not find the requested id , wtf are you actually trying to achieve, get your act together , man you're embarassing 🤦‍♂️",
       });
     }
- 
     next();
   }
+
+  exports.checkDataExists=(req, res, next)=>{
+   
+   if (!req.body.name || !req.body.price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Data not defined'
+    });
+  }
+  next();
+
+}
+
 //2) Route handlers------------------------------
 exports.getAllTours = (req, res) => {
     //can ccreate new cersion of api to do some changes , function is called a route handler
@@ -36,7 +48,7 @@ exports.getAllTours = (req, res) => {
   
   exports.getATour = (req, res) => {
     //var is id, multiple ids can be defined /:var/x/y, vars can be made optional using "?"
-    //can ccreate new cersion of api to do some changes , function is called a route handler
+    //can create new version of api to do some changes , function is called a route handler
     console.log(req.params); //req.params gets the value of var
     
     const tour = tours.find((el) => el.id === id);
@@ -89,7 +101,6 @@ exports.getAllTours = (req, res) => {
   // -----------------------------------------------------------------
   
   exports.DeleteTour = (req, res) => {
- 
     res.status(204).json({
       status: 'sucess',
       data: null,
