@@ -88,3 +88,16 @@ special type of middleware : param middleware
 
 that only runs for certain parameter
 
+==============================================
+accessing static file using express, files in file system that can not be accessed through url
+
+anything that has nothing to do with express is done outside the app.js
+
+env is set by express 
+
+to get var set by node , process.env 
+
+whenever we need some configuration changed based on enviroment that app is running in, we use different env variable
+
+all the env variables can be defined in env file , and to connect the env file to the node application use package called dotenv
+then require dottenv in app.js

@@ -6,9 +6,13 @@ const tourRouter = require('./router/tourRoutes');
 
 
 // 1) Middleware
-app.use(morgan('dev')); // gives the info about the request in the console
-app.use(express.json()); // this is the middleware that can modify the incoming data, it stands between req and res, data from the body(property of a req) is added to it
+if(process.env.NODE_ENV === "development"){
+  app.use(morgan('dev')); // gives the info about the request in the console
+}
 
+
+app.use(express.json()); // this is the middleware that can modify the incoming data, it stands between req and res, data from the body(property of a req) is added to it
+app.use(express.static(`${__dirname}/public`))
 app.use((req, res, next) => {
   // this middleware is applied to each request that comes after it
   console.log('hello from the middleware 😊');
