@@ -1,16 +1,16 @@
-
+/*eslint-disable*/
 const express = require('express')
-const {getAllTours,getATour,UpdateTour,DeleteTour,CreateNewTour, checkId,checkDataExists} = require("./../controlers/tourControlers")
+const {getAllTours,getATour,UpdateTour,DeleteTour,CreateNewTour} = require("./../controlers/tourControlers")
 const fs = require('fs');
 
 
 const router = express.Router();
 
-router.param("id",checkId)   //when ever url contains id param this middleware will be called 
+// router.param("id",checkId)   //when ever url contains id param this middleware will be called 
 
 router.route('/')
 .get(getAllTours)
-.post(checkDataExists,CreateNewTour);
+.post(CreateNewTour);
 
 
 

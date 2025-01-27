@@ -122,3 +122,83 @@ embedding /denormalizing : including related data into single document.
 
 ----------------
 using compass
+
+--------------------------------
+
+
+# MVC (Model-View-Controller) Architecture
+
+## Core Components
+
+### Model Layer
+- Contains business logic
+- Handles data-related operations
+- Implements business rules and data manipulation
+- Represents the application's data structure
+
+### Controller Layer
+- Handles application logic
+- Processes incoming requests
+- Interacts with models to get/manipulate data
+- Sends responses back to clients
+- Acts as intermediary between Model and View
+
+### View Layer
+- Handles presentation logic
+- Contains templates for rendering GUI
+- Only necessary for server-side rendered websites
+- Responsible for how data is presented to users
+
+## Request Flow in MVC
+
+1. Request arrives at application
+2. Router receives request and routes to appropriate controller
+3. Controller (handler function) processes the request
+4. Controller interacts with Model if data access/manipulation needed
+5. For server-side rendering:
+   - Controller gets template from View
+   - Data is injected into template
+   - Rendered page sent as response
+6. Response sent back to client
+
+## Separation of Logic
+
+### Application Logic (Controllers)
+- Manages technical aspects of how the application works
+- Handles HTTP requests and responses
+- Routes and middleware implementation
+- Bridge between Model and View layers
+- Request/response handling
+- Data formatting and validation
+
+### Business Logic (Models)
+- Implements core business rules and requirements
+- Handles data relationships and validation
+- Manages data transformations
+- Implements business calculations and operations
+- Data validation rules
+- Complex operations specific to business domain
+
+## Best Practices
+
+### Fat Model, Thin Controller Principle
+- Keep controllers simple and focused
+- Move complex logic to models
+- Controllers should mainly:
+  - Receive requests
+  - Call appropriate model methods
+  - Send responses
+- Models should contain:
+  - Data validation
+  - Business calculations
+  - Complex operations
+  - Data relationships
+
+### Benefits of MVC
+- Clear separation of concerns
+- Improved code organization
+- Better maintainability
+- Easier testing
+- Scalable architecture
+- Reusable components
+
