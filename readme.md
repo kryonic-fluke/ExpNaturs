@@ -101,3 +101,24 @@ whenever we need some configuration changed based on enviroment that app is runn
 
 all the env variables can be defined in env file , and to connect the env file to the node application use package called dotenv
 then require dottenv in app.js
+
+------------------------------
+prettier and eslint configuration
+npm i eslint prettier eslint-config-prettier eslint-plugin-prettier
+---------------------------------------
+about mongodb 
+
+its a nosql database > conllections(tables) > documents(rows) has a bson struture
+
+mongodb is a document based database , stores data in documents (field-value pair data structure , nosql).
+
+easy to distribute data across multiple machines 
+
+no document data schema required ,so each document can have different number and type of fields
+
+preformant :embedded data models, indexing , sharding, flexing documents , native duplicaiton etc
+
+embedding /denormalizing : including related data into single document.
+
+----------------
+using compass

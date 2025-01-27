@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const express = require('express');
 const app = express(); // this function will add bunch of methods to app var
 const morgan = require('morgan');
