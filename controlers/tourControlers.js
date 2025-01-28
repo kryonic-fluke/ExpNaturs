@@ -41,7 +41,7 @@ try{
   //Build Query 
   //Filtering 
   const queryObj  = {...req.query}
-  const excludeFields = ['page', 'sort', 'limit','filed'];
+  const excludeFields = ['page', 'sort', 'limit','fields'];
   excludeFields.forEach(el=> delete queryObj[el])
 
   //Advance Filtering
@@ -62,9 +62,20 @@ try{
   }
 
   else{
-    query=query.sort(-createdAt)
+    query=query.sort('-createdAt')
   }
+
+  // Filed limiting 
+  if(req.query.fields){    
+    const fields =req.query.fields.split(',').join(' ');
+    query = query.select(fields);
+  }
+  else{
+    query = query.select('-__v')
+  } 
+
   //Execute the query 
+
   const tours = await query
   //SEND RESPONSE
   res.status(200).json({
