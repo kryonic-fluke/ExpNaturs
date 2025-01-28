@@ -51,9 +51,19 @@ try{
   console.log();
   
 
-  const query = Tour.find(JSON.parse(queryStr))     
+  let query = Tour.find(JSON.parse(queryStr))    //returns a query obj   
  
+  //Sorting
 
+  if(req.query.sort){
+    const sortBY=  req.query.sort.split(',').join(' ');
+    query = query.sort(sortBY);
+
+  }
+
+  else{
+    query=query.sort(-createdAt)
+  }
   //Execute the query 
   const tours = await query
   //SEND RESPONSE
