@@ -35,13 +35,32 @@ const Tour = require("./../models/tourmodel")
 //2) Route handlers------------------------------
 exports.getAllTours = async (req, res) => {
                             
-  const tours =await Tour.find()//can ccreate new cersion of api to do some changes , function is called a route handler
 
 try{
+  // Alternate method:: const tours = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy')  //mongoose way of quering
+  //Build Query 
+  //Filtering 
+  const queryObj  = {...req.query}
+  const excludeFields = ['page', 'sort', 'limit','filed'];
+  excludeFields.forEach(el=> delete queryObj[el])
+
+  //Advance Filtering
+
+  let queryStr =JSON.stringify(queryObj);
+  queryStr=queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match=>`$${match}`)
+  console.log();
+  
+
+  const query = Tour.find(JSON.parse(queryStr))     
+ 
+
+  //Execute the query 
+  const tours = await query
+  //SEND RESPONSE
   res.status(200).json({
     status: 'success',
-    results: tours.length,
-    data: {
+    results: tours.length, 
+    data: { 
       tours
     },
   });

@@ -27,7 +27,6 @@ mongoose
     try{
         await Tour.create(tours)
         console.log(('data successfully included')); 
-
     }
     catch(err) {
         console.log(err);
