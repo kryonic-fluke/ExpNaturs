@@ -202,3 +202,6 @@ using compass
 - Scalable architecture
 - Reusable components
 
+
+Pagination : ?page=2,limit=50 (limit is the amount of document, page no. represents which page is shown among available pages)
+
