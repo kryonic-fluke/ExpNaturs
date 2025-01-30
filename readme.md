@@ -225,3 +225,20 @@ we can define function to run before or after an event
 documentsacts on currently processing documents
 
 query middleware runs a function before and after a query is executed
+
+------------------------
+validation for data that is coming to our model 
+Data Validation:
+
+Checks if data meets specified criteria and constraints
+Ensures data is in the correct format, range, and type
+Verifies data integrity and accuracy
+Happens BEFORE saving to database
+
+=======================
+Data Sanitization:
+
+Cleans and modifies input data to make it safe and consistent
+Removes malicious code or unwanted characters
+Standardizes data format
+Happens BEFORE validation

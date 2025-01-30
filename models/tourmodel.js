@@ -9,6 +9,8 @@ const tourSchema = new mongoose.Schema({
     required: [true, 'A tour must have a name'],
     unique: true,
     trim: true,
+    maxlength:[40,'A tour name must have less than or equal 40 characters'],
+    minlength:[10,'A tour name must have more than or equal 10 characters']
   },
 
   slug:String,
@@ -35,11 +37,16 @@ const tourSchema = new mongoose.Schema({
   difficulty: {
     type: String,
     required: [true, 'A tour must have difficulty'],
+    enum:{values:['easy','medium','difficult'],
+      message:'Difficulty is either easy medium or difficult'
+    }
   },
 
   ratingsAverage: {
     type: Number,
     rdefault: 0,
+    min:[1, 'Rating must be above 1.0'],    //min and max validators also work for dates 
+    max:[5, 'Rating must be below 5.0']
   },
 
   ratingsQuantity: {
@@ -121,12 +128,22 @@ tourSchema.pre(/^find/,function(next){
   next();  
 });
 
+
 tourSchema.post(/^find/,function(docs,next){
 console.log(`query took ${Date.now()- this.start}milliseconds`);
 console.log(docs);
-
   next() 
 })
+
+//aggregation mddleware happens before and after aggregation happens
+
+tourSchema.pre('aggregate',function(next){   //here this points to current aggrgation object 
+  this.pipeline().unshift({$match:{secretTour: {$ne:true}}})   //to indlue a filter to aggregate, that excludes secretTour
+  console.log(this.pipeline());
+  next()
+})
+
+
 
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
