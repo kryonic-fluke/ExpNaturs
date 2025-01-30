@@ -209,3 +209,8 @@ Pagination : ?page=2,limit=50 (limit is the amount of document, page no. represe
 The aggregation pipeline is a framework in MongoDB for processing data. It consists of a series of stages that documents from a specified collection pass through sequentially. Each stage performs a specific operation on the documents, transforming them into an aggregated result. The pipeline allows for complex data transformations and computations, enabling developers to filter, group, sort, and analyze data effectively.
 
 used to calculate averages , min , max ,distances and all kind of stuff
+
+------------------------
+virtual properties: fields that we can define in our schema , that will not be persisted , not be saved into database. 
+
+for derieved states

@@ -74,7 +74,16 @@ const tourSchema = new mongoose.Schema({
   },
   
   startDates: [Date],
-});
 
+
+},{
+  toJSON:{virtuals:true},  //to make virtuals visible 
+  toObject:{virtuals:true}
+})
+//this property will get created each time we get the data out of the databse
+//note this field can not be used for query, cause its not part of the database
+tourSchema.virtual('durationWeeks').get(function (){
+  return this.duration/7  
+})
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
