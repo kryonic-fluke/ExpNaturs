@@ -1,14 +1,13 @@
 /* eslint-disable */
 // const fs = require("fs")
 const Tour = require('./../models/tourmodel');
-const APIFeatures = require("./utils/ApiFeat")
+const APIFeatures = require('./utils/ApiFeat');
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 };
-
 
 //2) Route handlers------------------------------
 exports.getAllTours = async (req, res) => {
@@ -123,3 +122,109 @@ exports.DeleteTour = async (req, res) => {
     });
   }
 };
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } }, //stage filters documents based on specified criteria
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          numTours: { $sum: 1 },
+          numRating: { $sum: '$ratingsQuantity' },
+          averageRatnig: { $avg: '$ratingsAverage' },
+          averageprice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+
+      {
+        $sort: { avgPrice: 1 },
+      }, //1 for asccending
+
+      // {
+      //   match: { _id: { $ne: 'EASY' } },
+      // },
+      
+    
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        stats,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (req,res)=>{
+  try{
+      const year = req.params.year *1;
+      const plan =await Tour.aggregate([
+
+        {
+          $unwind: '$startDates'  //deconstructs each document
+        },
+
+        {
+          $match: {
+            startDates:{
+              $gte: new Date(`${year}-01-01`),
+              $lte:new Date(`${year}-12-31`)
+            }
+          }
+        },
+
+        {
+          $group:{
+            _id:{$month: '$startDates'},  //all the tours registered in a specific month
+            numTourStart :{$sum : 1},  //adds all the tours in the month
+            tour:{$push: '$name'}  //forms an arrays of names of tours happening in the month
+          }
+        },
+        {$addFields:{
+          month:'$_id'
+        }},
+
+        {
+          $project:{
+            _id:0         //0 means don't show the field, 1 means show the field 
+          }
+        },
+
+
+        {
+          $sort:{
+            numTourStart:-1
+          }
+        },
+
+        {
+          $limit:6  //limit the number of document 
+        }
+
+      ])
+      res.status(200).json({
+        status: 'success',
+        data: {
+          plan,
+        },
+      });
+  }
+ 
+  
+  catch(err){
+    res.status(404).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+}
