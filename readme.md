@@ -214,3 +214,14 @@ used to calculate averages , min , max ,distances and all kind of stuff
 virtual properties: fields that we can define in our schema , that will not be persisted , not be saved into database. 
 
 for derieved states
+----------------
+Mongooose middleware: can make something happen between two events  , like each time some document is saved, we can run a function betweeen the save command issued and actuall saving of the documents, thats why middleware are called pre and post hook
+
+we can define function to run before or after an event
+
+
+4 types :document , query, aggregate, model
+
+documentsacts on currently processing documents
+
+query middleware runs a function before and after a query is executed

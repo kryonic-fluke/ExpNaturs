@@ -1,6 +1,7 @@
 /*eslint-disable*/
 
 const mongoose = require('mongoose');
+const slugify  =require('slugify');
 
 const tourSchema = new mongoose.Schema({
   name: {
@@ -9,6 +10,9 @@ const tourSchema = new mongoose.Schema({
     unique: true,
     trim: true,
   },
+
+  slug:String,
+
   rating: {
     type: Number,
     default: 4.5,
@@ -74,7 +78,10 @@ const tourSchema = new mongoose.Schema({
   },
   
   startDates: [Date],
-
+ 
+  secretTour:{
+    default:false,
+  }
 
 },{
   toJSON:{virtuals:true},  //to make virtuals visible 
@@ -85,5 +92,44 @@ const tourSchema = new mongoose.Schema({
 tourSchema.virtual('durationWeeks').get(function (){
   return this.duration/7  
 })
+
+//pre runs before .save and .create (), documents middleware ,  
+tourSchema.pre('save', function (next){
+this.slug = slugify(this.name,{lower:true, }) // middleware has the access to currently saved middleware this points to the currently processing document
+next()
+})
+
+
+// tourSchema.pre('save', function (next){
+// console.log('wecwecwe');
+// next();
+// })
+
+// //post middleware are exectued after all middleware are completed
+// tourSchema.post('save',function(doc,next){
+//   console.log(doc);
+//   next();
+// })
+
+///query middleware , this keyword will point at the document
+   
+//to hide secret tour before find query
+tourSchema.pre(/^find/,function(next){  
+// tourSchema.pre('find',function(next){  
+  this.find({secret:{$ne: true}})       //chaning find query to comming find query
+  this.start =   Date.now();
+  next();  
+});
+
+tourSchema.post(/^find/,function(docs,next){
+console.log(`query took ${Date.now()- this.start}milliseconds`);
+console.log(docs);
+
+  next() 
+})
+
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
+
+
+   
