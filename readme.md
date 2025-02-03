@@ -1,8 +1,8 @@
-npm init > name the project  and so on
+npm init > name the project and so on
 then download exp js
 npm i express
 
-convention to have all the exp configuration in app.js 
+convention to have all the exp configuration in app.js
 
 Whats an api >Application programming interfaceAPI and RESTful API Concepts
 API (Application Programming Interface)
@@ -18,7 +18,6 @@ Divide data into logical resources
 Use structured, resource-based URLs
 Use appropriate HTTP methods for actions
 
-
 Endpoint Naming Conventions
 
 Use resource names, not verbs
@@ -26,10 +25,6 @@ Examples:
 
 /tours (not /getTours)
 Unique identifiers allowed (e.g., /tours/123)
-
-
-
-
 
 HTTP Methods
 
@@ -59,31 +54,27 @@ Each request must contain all processing information
 Server doesn't remember previous states
 Client handles state management
 
-
-
 Corrections and Improvements:
 
+---
 
+Express development: the request response cycle
 
--------------------------------------------------------------------
+Incoming request : for a rececived request a request and a response object is created , in order to process the data middle ware is used , which can modify the data before sending a response
 
-Express development: the request response cycle 
+All the middlewware that is used is called a middleware stack
+order of execution of middleware depends in there position in the code , it is fcfs
 
-Incoming request : for a rececived request  a request and a response object is created , in order to process the data middle ware is used , which can modify the data before sending a response 
+request a request and a response object passes through each middleware , there is a next() in middle ware , this function will be executed with exact same request and response object
 
- All the middlewware that is used is called a middleware stack 
- order of execution of middleware depends in there position in the code , it is fcfs
-
-request  a request and a response object passes through each middleware , there is a next() in middle ware , this function will be executed with exact same request and response object
-
-
-last middle ware is route handler , that next is not called here 
+last middle ware is route handler , that next is not called here
 
 then the request response cycle is over
 
-------------
-third party midleware function  morgan (allows to see reqeust in the console)
-=======================================================================
+---
+
+# third party midleware function morgan (allows to see reqeust in the console)
+
 special type of middleware : param middleware
 
 that only runs for certain parameter
@@ -93,26 +84,29 @@ accessing static file using express, files in file system that can not be access
 
 anything that has nothing to do with express is done outside the app.js
 
-env is set by express 
+env is set by express
 
-to get var set by node , process.env 
+to get var set by node , process.env
 
 whenever we need some configuration changed based on enviroment that app is running in, we use different env variable
 
 all the env variables can be defined in env file , and to connect the env file to the node application use package called dotenv
 then require dottenv in app.js
 
-------------------------------
+---
+
 prettier and eslint configuration
 npm i eslint prettier eslint-config-prettier eslint-plugin-prettier
----------------------------------------
-about mongodb 
+
+---
+
+about mongodb
 
 its a nosql database > conllections(tables) > documents(rows) has a bson struture
 
 mongodb is a document based database , stores data in documents (field-value pair data structure , nosql).
 
-easy to distribute data across multiple machines 
+easy to distribute data across multiple machines
 
 no document data schema required ,so each document can have different number and type of fields
 
@@ -120,23 +114,25 @@ preformant :embedded data models, indexing , sharding, flexing documents , nativ
 
 embedding /denormalizing : including related data into single document.
 
-----------------
+---
+
 using compass
 
---------------------------------
-
+---
 
 # MVC (Model-View-Controller) Architecture
 
 ## Core Components
 
 ### Model Layer
+
 - Contains business logic
 - Handles data-related operations
 - Implements business rules and data manipulation
 - Represents the application's data structure
 
 ### Controller Layer
+
 - Handles application logic
 - Processes incoming requests
 - Interacts with models to get/manipulate data
@@ -144,6 +140,7 @@ using compass
 - Acts as intermediary between Model and View
 
 ### View Layer
+
 - Handles presentation logic
 - Contains templates for rendering GUI
 - Only necessary for server-side rendered websites
@@ -164,6 +161,7 @@ using compass
 ## Separation of Logic
 
 ### Application Logic (Controllers)
+
 - Manages technical aspects of how the application works
 - Handles HTTP requests and responses
 - Routes and middleware implementation
@@ -172,6 +170,7 @@ using compass
 - Data formatting and validation
 
 ### Business Logic (Models)
+
 - Implements core business rules and requirements
 - Handles data relationships and validation
 - Manages data transformations
@@ -182,6 +181,7 @@ using compass
 ## Best Practices
 
 ### Fat Model, Thin Controller Principle
+
 - Keep controllers simple and focused
 - Move complex logic to models
 - Controllers should mainly:
@@ -195,6 +195,7 @@ using compass
   - Data relationships
 
 ### Benefits of MVC
+
 - Clear separation of concerns
 - Improved code organization
 - Better maintainability
@@ -202,23 +203,23 @@ using compass
 - Scalable architecture
 - Reusable components
 
-
 Pagination : ?page=2,limit=50 (limit is the amount of document, page no. represents which page is shown among available pages)
 
---------------------------------
+---
+
 The aggregation pipeline is a framework in MongoDB for processing data. It consists of a series of stages that documents from a specified collection pass through sequentially. Each stage performs a specific operation on the documents, transforming them into an aggregated result. The pipeline allows for complex data transformations and computations, enabling developers to filter, group, sort, and analyze data effectively.
 
 used to calculate averages , min , max ,distances and all kind of stuff
 
-------------------------
-virtual properties: fields that we can define in our schema , that will not be persisted , not be saved into database. 
+---
 
-for derieved states
-----------------
-Mongooose middleware: can make something happen between two events  , like each time some document is saved, we can run a function betweeen the save command issued and actuall saving of the documents, thats why middleware are called pre and post hook
+virtual properties: fields that we can define in our schema , that will not be persisted , not be saved into database.
+
+## for derieved states
+
+Mongooose middleware: can make something happen between two events , like each time some document is saved, we can run a function betweeen the save command issued and actuall saving of the documents, thats why middleware are called pre and post hook
 
 we can define function to run before or after an event
-
 
 4 types :document , query, aggregate, model
 
@@ -226,8 +227,9 @@ documentsacts on currently processing documents
 
 query middleware runs a function before and after a query is executed
 
-------------------------
-validation for data that is coming to our model 
+---
+
+validation for data that is coming to our model
 Data Validation:
 
 Checks if data meets specified criteria and constraints
@@ -242,3 +244,27 @@ Cleans and modifies input data to make it safe and consistent
 Removes malicious code or unwanted characters
 Standardizes data format
 Happens BEFORE validation
+
+---
+
+Error handeling
+break points , where our code stops running
+
+ error handling in Express applications, emphasizing centralized management of errors. Here are the key points:
+
+Previous Error Handling: Earlier methods involved sending error messages directly from route handlers as JSON, which is inefficient.
+
+Types of Errors:
+
+Operational Errors: Predictable issues stemming from user actions, system failures, or network problems (e.g., invalid routes, incorrect data input). These should be anticipated and handled proactively.
+Programming Errors: Bugs caused by developers (e.g., referencing undefined variables, misuse of asynchronous functions). Recognizing the difference between these errors is crucial for effective handling.
+Focus on Operational Errors: In Express, managing operational errors is emphasized as they are easier to capture.
+
+Global Error Handling Middleware: Express offers built-in middleware to centralize error management, catching errors from various parts of the application like route handlers and model validators.
+
+Informative Responses: Effective error handling involves sending informative responses to clients, which may include options like retrying, crashing the server, or ignoring the error.
+
+Separation of Concerns: The global middleware allows developers to keep business logic separate from error handling, promoting cleaner code.
+
+Implementation Encouragement: The lecture ends by encouraging the implementation of this centralized error handling approach in Express applications.
+
