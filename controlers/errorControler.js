@@ -6,6 +6,13 @@ const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path} : ${err.value}`;
   return new AppError(message, 400); //so we converted a mongoose error in nicely formated operational error
 };
+
+const handleDuplicateFeildDB = (err)=>{
+  const value = Object.values(err.keyValue)[0];
+  
+  const message = `Duplicate field value: ${value}. Please use another value.`;
+  return new AppError(message,400)
+}
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -33,17 +40,19 @@ const sendErrorProduction = (err, res) => {
 };
 module.exports = (err, req, res, next) => {
   // console.log(err.stack);  //stack shows where error happened
-  console.log(process.env.NODE_ENV);
 
   err.statusCode = err.statusCode || 500; // Default to 500 if statusCode isn't set
   err.status = err.status || 'error'; // Default to 'error' if status isn't set
   if (process.env.NODE_ENV === 'production') {
     let error = JSON.parse(JSON.stringify(err)); // Creating a shallow copy of the err object
-
+    console.log(error);
+    
     if (error.name === 'CastError') {
       error = handleCastErrorDB(error); // Passes the error that Mongoose created to this function
       // The function should return a new error object with the operation set to true
     }
+
+    if(error.code===11000) error=handleDuplicateFeildDB(error)
 
     sendErrorProduction(error, res); // Sending the error response in production
   }
