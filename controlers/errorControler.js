@@ -8,10 +8,27 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateFeildDB = (err)=>{
-  const value = Object.values(err.keyValue)[0];
   
-  const message = `Duplicate field value: ${value}. Please use another value.`;
-  return new AppError(message,400)
+  const errors = Object.values(err.errors).map(el => el.message);
+  console.log(errors);
+  
+  // Create a comprehensive error message
+  const message = `Invalid input data. ${errors.join('. ')}`;
+  
+  // Return a new operational error with 400 status (Bad Request)
+  return new AppError(message, 400);
+}
+
+const handleValidationErrorDB =(err)=>{
+  const errors = Object.keys(err.errors).map(key => {
+    // Directly access the message property
+    return err.errors[key].message;
+  });
+  console.log(errors);
+  
+
+  const message = `Invalid input data. ${errors.join('. ')}`;
+  return new AppError(message, 400);
 }
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -45,6 +62,10 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error'; // Default to 'error' if status isn't set
   if (process.env.NODE_ENV === 'production') {
     let error = JSON.parse(JSON.stringify(err)); // Creating a shallow copy of the err object
+    error.name = err.name;
+    error.message = err.message;
+    error.errors = err.errors;
+
     console.log(error);
     
     if (error.name === 'CastError') {
@@ -54,6 +75,7 @@ module.exports = (err, req, res, next) => {
 
     if(error.code===11000) error=handleDuplicateFeildDB(error)
 
+      if(error.name==='ValidationError') error=handleValidationErrorDB(error,res)
     sendErrorProduction(error, res); // Sending the error response in production
   }
 };

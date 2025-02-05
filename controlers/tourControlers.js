@@ -13,7 +13,6 @@ exports.aliasTopTours = (req, res, next) => {
 
 exports.getAllTours = catchasync(async (req, res) => {
   //Execute the query
-  console.log(req.query);
 
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
@@ -59,7 +58,7 @@ exports.UpdateTour = catchasync(async (req, res) => {
     new: true,
     runValidators: true,
   });
-  if(!tours){
+  if(!tour){
     return next(new AppError('No tour found with that Id', 404))
   }
   res.status(200).json({

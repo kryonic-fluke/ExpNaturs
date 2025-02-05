@@ -268,3 +268,8 @@ Separation of Concerns: The global middleware allows developers to keep business
 
 Implementation Encouragement: The lecture ends by encouraging the implementation of this centralized error handling approach in Express applications.
 
+-------------------- 
+unhandeled rejections : promises that are unsucecessfull might occur outside expres, example mongodb data connection 
+
+---------------
+uncaught exceptions : errors or bugs that are in our syncgronous code and not handeled anywhere
