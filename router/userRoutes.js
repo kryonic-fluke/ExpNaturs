@@ -1,9 +1,11 @@
-const express = require("express")
+/*eslint-disable*/
+const express = require('express');
 const router = express.Router();
 const {getAllUsers,getAuser,UpdateUser,deleteUser,createUsers} = require("./../controlers/userControlers.")
+const {signup} = require("./../controlers/authenticationControlle")
 
 
-
+router.post('/signup',signup)
 
 router.route('/').get(getAllUsers).post(createUsers);
 
