@@ -1,11 +1,13 @@
 /*eslint-disable*/
 const express = require('express');
 const router = express.Router();
-const {getAllUsers,getAuser,UpdateUser,deleteUser,createUsers} = require("./../controlers/userControlers.")
-const {signup} = require("./../controlers/authenticationControlle")
+const {getAllUsers,getAuser,UpdateUser,deleteUser,createUsers} = require("./../controlers/userControlers.");
+const {signup, login} = require("./../controlers/authenticationControlle");
 
 
 router.post('/signup',signup)
+router.post('/login',login)
+
 
 router.route('/').get(getAllUsers).post(createUsers);
 
