@@ -1,61 +1,82 @@
 /*eslint-disable*/
 
-
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt =require('bcryptjs')
-const userSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: [true, 'Please Enter your name'],
-            trim: true,
-          },
-          email: {
-            type: String,
-            required: [true, 'Please enter your email address'],
-            unique: true,
-            trim: true,
-            lowercase: true,
-            validate: [validator.isEmail, 'Please enter a valid email'],
-          },
-          photos: {
-            type: String, // path to photo
-          },
-          password: {
-            type: String, // Correct type!
-            required: [true, 'Please provide a password'], // More descriptive message
-            minlength: [8, 'Password must be at least 8 characters'], // Set a reasonable minimum length
-            trim: true, // Trim whitespace
-            select:false,
-          },
-          passwordConfirmation: {
-            type: String,
-            required: [true,'Please confirm your password'],
-            validate:{
-              //The only works save!! and save ,while updating the password this validation will not work 
-              validator:function(el){
-                return el=== this.password;
-              }
-            },
-            message:"password didn't match",
-            
-          },
-        },
+const bcrypt = require('bcryptjs');
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Please Enter your name'],
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: [true, 'Please enter your email address'],
+    unique: true,
+    trim: true,
+    lowercase: true,
+    validate: [validator.isEmail, 'Please enter a valid email'],
+  },
+  photos: {
+    type: String, // path to photo
+  },
+  password: {
+    type: String, // Correct type!
+    required: [true, 'Please provide a password'], // More descriptive message
+    minlength: [8, 'Password must be at least 8 characters'], // Set a reasonable minimum length
+    trim: true, // Trim whitespace
+    select: false,
+  },
+  passwordConfirmation: {
+    type: String,
+    required: [true, 'Please confirm your password'],
+    validate: {
+      //The only works save!! and save ,while updating the password this validation will not work
+      validator: function (el) {
+        return el === this.password;
+      },
+    },
+    message: "password didn't match",
+  },
 
-    
-)
+  passwordChangedAt: {
+    type: Date,
+    select: true, // Explicitly set to true
+  },
 
-userSchema.methods.correctPassword = async function(cadidatePassword, userPassword){    //instance method, available in all user document 
-  return await bcrypt.compare(cadidatePassword,userPassword);  //return boolean
-}
 
-userSchema.pre('save',async function(next){
-  if(!this.isModified('password')) return next();
+  additional:{
+    type:String,
+    select:true,
+  }
+});
+
+userSchema.methods.correctPassword = async function (
+  cadidatePassword,
+  userPassword,
+) {
+  //instance method, available in all user document
+  return await bcrypt.compare(cadidatePassword, userPassword); //return boolean
+};
+
+userSchema.methods.changedpasswordAfter = function (JWTtimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp= parseInt(this.passwordChangedAt.getTime() /1000,10);
+    console.log(changedTimestamp, JWTtimestamp);
+    return JWTtimestamp<changedTimestamp;   //gives true if the passord changed after logining in 
+  }
+
+  
+  
+  return false;  //means user has not changed its password 
+};
+
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
   //hash the password with cost 14
-  this .password=await bcrypt.hash(this.password,14)          //asynchronous version 
+  this.password = await bcrypt.hash(this.password, 14); //asynchronous version
   this.passwordConfirmation = undefined; //passwordconfirmation was only needed for confirmation after that is deleted
-})
+});
 
-const User = mongoose.model('User',userSchema);
-module.exports =User;
+const User = mongoose.model('User', userSchema);
+module.exports = User;

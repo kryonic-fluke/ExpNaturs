@@ -1,6 +1,7 @@
 /*eslint-disable*/
 const express = require('express')
 const {getAllTours,getATour,UpdateTour,DeleteTour,CreateNewTour,aliasTopTours,getTourStats,getMonthlyPlan} = require("./../controlers/tourControlers")
+const {protects}  = require('./../controlers/authenticationControlle')
 const fs = require('fs');
 
 
@@ -12,7 +13,7 @@ router.route('/tour-stats').get(getTourStats);
 router.route('/monthly-plan/:year').get(getMonthlyPlan);
 
 router.route('/')
-.get(getAllTours)
+.get(protects,getAllTours)
 .post(CreateNewTour);
 
 
@@ -24,8 +25,5 @@ router //its a middlware
   .get(getATour);
 
 
-
-
-  
 
   module.exports = router

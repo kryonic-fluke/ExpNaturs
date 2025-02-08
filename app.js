@@ -16,8 +16,15 @@ if(process.env.NODE_ENV === "development"){
 
 app.use(express.json()); // this is the middleware that can modify the incoming data, it stands between req and res, data from the body(property of a req) is added to it
 app.use(express.static(`${__dirname}/public`))
+app.use((req,res,next)=>{
+  req.requestTime  =new Date().toISOString();
+  // console.log(req.headers);
+
+  
+  next()
+})
 // app.use((req, res, next) => {
-//   // this middleware is applied to each request that comes after it
+//   // this middleware is applied to each request that comes after  it
 //   console.log('hello from the middleware 😊');
 //   next(); // if we didn't call the next, the req response cycle will be stuck
 // });
