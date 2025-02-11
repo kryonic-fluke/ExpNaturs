@@ -1,9 +1,11 @@
 /*eslint-disable*/
-const { promisify } = require('util'); 
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
 const User = require('./../models/usermodel');
+const crypto = require('crypto');
 const AppError = require('./utils/Apperror');
-const changedpasswordAfter = require('./../models/usermodel')
+const sendEmail = require('./utils/email');
+const changedpasswordAfter = require('./../models/usermodel');
 const catchasync = require('./utils/catchAsync');
 
 const signToken = (id) => {
@@ -21,8 +23,8 @@ exports.signup = catchasync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirmation: req.body.passwordConfirmation,
-    passwordChangedAt:req.body.passwordChangedAt ,
-    role: req.body.role ,
+    passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role,
   }); //inside the sign is the payload
   // const token= jwt.sign({id:newUser._id}, process.env.JWT_SECRET,{
   //   expiresIn:process.env.JWT_EXPIRES_IN         //THIS IS A OPTION
@@ -56,70 +58,131 @@ exports.login = catchasync(async (req, res, next) => {
     token,
   });
 });
-  
 
-exports.protects = catchasync(async function(req,res,next){
-  //1)getting token and check of it's there 
+exports.protects = catchasync(async function (req, res, next) {
+  //1)getting token and check of it's there
   let token;
-  
-    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
-     token  =req.headers.authorization.split(' ')[1];
-      
-    }
-    if(!token) return next(new AppError('You are not logged in ,pls login to get access',401)) //401 is unautharized 
-  //2)Verification  token 
-   const decoded= await promisify(jwt.verify)(token,process.env.JWT_SECRET,);
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  if (!token)
+    return next(
+      new AppError('You are not logged in ,pls login to get access', 401),
+    ); //401 is unautharized
+  //2)Verification  token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   //3)Chk if user still exists  , for cases if user deleted itself , or if for any reason user changed its password after the token has been issued
-    
- const currentUser = await User.findById(decoded.id)
- if(!currentUser){
-  return next(new AppError('The user belonging to this token does no longer exist.', 401))
- }
-  //4 chk if user change password after token was issued 
- if(currentUser.changedpasswordAfter(decoded.iat)) {
-  return next(new AppError('user recently changed password!Please login again.',401)) 
+
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError(
+        'The user belonging to this token does no longer exist.',
+        401,
+      ),
+    );
+  }
+  //4 chk if user change password after token was issued
+  if (currentUser.changedpasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('user recently changed password!Please login again.', 401),
+    );
   }
 
-  // after all this auth user will get the access to the protected route 
-  req.user=currentUser;
+  // after all this auth user will get the access to the protected route
+  req.user = currentUser;
   next();
-})
+});
 
-
-
-exports.restrictTo=(...roles)=>{
-  return (req,res,next)=>{
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
     //roles is an array ['admin','lead-guide']
-    if (!roles.includes(req.user.role)) { // Corrected: roles.includes()
+    if (!roles.includes(req.user.role)) {
+      // Corrected: roles.includes()
       return next(
-          new AppError('You do not have the permission to perform this action', 403)
+        new AppError(
+          'You do not have the permission to perform this action',
+          403,
+        ),
       ); // forbidden
-  }
-    next();
-  }
-}
-
-
-
-exports.forgotPassword = catchasync(async(req,res,next)=>{
-  //1) get user based on Posted email
-  console.log("Email being searched:", req.body.email); // Log the email
-
-    const user = await User.findOne({email:req.body.email});
-    if(!user){
-      return next(new AppError('There is  no user with email address.', 404))
     }
+    next();
+  };
+};
+
+exports.forgotPassword = catchasync(async (req, res, next) => {
+  // 1) get user based on Posted email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+      return next(new AppError('There is no user with that email address.', 404));
+  }
+  // 2) Generate the random reset token
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false }); //this line will deactivate all the validators in the schema
+
+  // 3) Send it to the user's email
+  const resetURL = `${req.protocol}://${req.get('host')}/api/v1/user/resetPassword/${resetToken}`; // Corrected URL
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email.`;
+  
  
 
-  //2)greater the random reset token 
-    const resetToken =user.createPasswordResetToken();
-    await user.save({validateBeforeSave: false});  //this line will deactivate all the validators in the schema 
 
-  //3)send it to user's email 
+  try {
+      await sendEmail({
+          email: user.email,
+          subject: 'Password Reset Request', // More appropriate subject
+          message: message, // Pass the message with the URL
+      });
 
+      res.status(200).json({
+          status: 'success',
+          message: 'Token sent to email'
+      });
+
+  } catch (err) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ validateBeforeSave: false }); // Still save to reset token/expiry on error
+
+      return next(new AppError('There was an error sending the email.', 500));
+  }
+
+    
 })
-
-exports.resetPassword = (req,res,next)=>{
+ 
+exports.resetPassword =catchasync (async(req, res, next) => {
+  //1)get user based on token
+  const hashedToken =  crypto.createHash('sha256').update(req.params.token).digest('hex');  //encrypting the token sent to params 
   
-}
+  const user = await User.findOne({passwordResetToken:hashedToken, passwordResetExpires:{$gt:Date.now()}} );  //finding the user based on the toeken, and for which token is not expired
+
+  //2)if token has not expired ,and there is user, set the new passsword
+
+  if(!user){
+    return next(new AppError('Token is invalid or has expired',400))
+  }
+
+  user.password=req.body.password;
+  user.passwordConfirmation=req.body.passwordConfirmation;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save()
+  //3 Update the changedpasswordAt property for the current user 
+
+
+  //4) log the user in, send JWT
+
+
+  const token = signToken(user._id);
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
+});
+

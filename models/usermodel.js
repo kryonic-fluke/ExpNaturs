@@ -59,6 +59,13 @@ const userSchema = new mongoose.Schema({
  passwordResetExpires:Date
 });
 
+
+
+userSchema.pre('save',function(next){
+  if(!this.isModified('password') ||this.isNew) return next();
+  this.passwordChangedAt  = Date.now()-1000;
+next();
+})
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
@@ -88,9 +95,9 @@ userSchema.pre('save', async function (next) {
 
 
 userSchema.methods.createPasswordResetToken = function (){
-  console.log("Crypto object:", typeof crypto);  
+ 
 //this is sent to user before he creates a new paassword
-  const resetToken = crypto.randomBytes(32).toString('hex');   //this is sent to the user's emial
+const resetToken = crypto.randomBytes(32).toString('hex');   //this is sent to the user's emial
  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');   //this set in the databse
   console.log(resetToken,this.passwordResetToken);
  
