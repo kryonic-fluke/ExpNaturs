@@ -1,7 +1,7 @@
 /*eslint-disable*/
 const express = require('express')
 const {getAllTours,getATour,UpdateTour,DeleteTour,CreateNewTour,aliasTopTours,getTourStats,getMonthlyPlan} = require("./../controlers/tourControlers")
-const {protects}  = require('./../controlers/authenticationControlle')
+const {protects,restrictTo}  = require('./../controlers/authenticationControlle')
 const fs = require('fs');
 
 
@@ -21,7 +21,7 @@ router.route('/')
 router //its a middlware
   .route('/:id')
   .patch(UpdateTour)
-  .delete(DeleteTour) 
+  .delete(protects,restrictTo('admin','lead-guide'),DeleteTour) 
   .get(getATour);
 
 

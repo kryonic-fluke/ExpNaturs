@@ -21,7 +21,8 @@ exports.signup = catchasync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirmation: req.body.passwordConfirmation,
-    passwordChangedAt:req.body.passwordChangedAt 
+    passwordChangedAt:req.body.passwordChangedAt ,
+    role: req.body.role ,
   }); //inside the sign is the payload
   // const token= jwt.sign({id:newUser._id}, process.env.JWT_SECRET,{
   //   expiresIn:process.env.JWT_EXPIRES_IN         //THIS IS A OPTION
@@ -55,7 +56,7 @@ exports.login = catchasync(async (req, res, next) => {
     token,
   });
 });
-
+  
 
 exports.protects = catchasync(async function(req,res,next){
   //1)getting token and check of it's there 
@@ -84,3 +85,41 @@ exports.protects = catchasync(async function(req,res,next){
   req.user=currentUser;
   next();
 })
+
+
+
+exports.restrictTo=(...roles)=>{
+  return (req,res,next)=>{
+    //roles is an array ['admin','lead-guide']
+    if (!roles.includes(req.user.role)) { // Corrected: roles.includes()
+      return next(
+          new AppError('You do not have the permission to perform this action', 403)
+      ); // forbidden
+  }
+    next();
+  }
+}
+
+
+
+exports.forgotPassword = catchasync(async(req,res,next)=>{
+  //1) get user based on Posted email
+  console.log("Email being searched:", req.body.email); // Log the email
+
+    const user = await User.findOne({email:req.body.email});
+    if(!user){
+      return next(new AppError('There is  no user with email address.', 404))
+    }
+ 
+
+  //2)greater the random reset token 
+    const resetToken =user.createPasswordResetToken();
+    await user.save({validateBeforeSave: false});  //this line will deactivate all the validators in the schema 
+
+  //3)send it to user's email 
+
+})
+
+exports.resetPassword = (req,res,next)=>{
+  
+}

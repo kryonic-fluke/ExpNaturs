@@ -341,3 +341,11 @@ Authentication: If the two signatures match, it means that the header and payloa
 Athentication starts : login
 
 package : jsonwebtoken  , jwt.sign method to create a new token
+
+
+
+=------------------------------------------------------
+
+reset password : user sends a post request to forgot route m that will create a reset token and will send the email address that is provided , Note is a simple web token not a jwt
+
+then user sendsd the token from the email along with new password oinorder to update his password , 

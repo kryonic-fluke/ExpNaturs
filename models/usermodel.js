@@ -2,7 +2,10 @@
 
 const mongoose = require('mongoose');
 const validator = require('validator');
+const crypto =require('crypto');
 const bcrypt = require('bcryptjs');
+
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -19,6 +22,12 @@ const userSchema = new mongoose.Schema({
   },
   photos: {
     type: String, // path to photo
+  },
+
+  role:{
+    type:String,
+    enum:['user','guide','lead-guide','admin'],
+    default:'user'
   },
   password: {
     type: String, // Correct type!
@@ -45,18 +54,17 @@ const userSchema = new mongoose.Schema({
   },
 
 
-  additional:{
-    type:String,
-    select:true,
-  }
+  passwordResetToken :String,
+
+ passwordResetExpires:Date
 });
 
 userSchema.methods.correctPassword = async function (
-  cadidatePassword,
+  candidatePassword,
   userPassword,
 ) {
   //instance method, available in all user document
-  return await bcrypt.compare(cadidatePassword, userPassword); //return boolean
+  return await bcrypt.compare(candidatePassword, userPassword); //return boolean
 };
 
 userSchema.methods.changedpasswordAfter = function (JWTtimestamp) {
@@ -66,7 +74,7 @@ userSchema.methods.changedpasswordAfter = function (JWTtimestamp) {
     return JWTtimestamp<changedTimestamp;   //gives true if the passord changed after logining in 
   }
 
-  
+
   
   return false;  //means user has not changed its password 
 };
@@ -78,5 +86,20 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirmation = undefined; //passwordconfirmation was only needed for confirmation after that is deleted
 });
 
+
+userSchema.methods.createPasswordResetToken = function (){
+  console.log("Crypto object:", typeof crypto);  
+//this is sent to user before he creates a new paassword
+  const resetToken = crypto.randomBytes(32).toString('hex');   //this is sent to the user's emial
+ this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');   //this set in the databse
+  console.log(resetToken,this.passwordResetToken);
+ 
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+
+  return resetToken;  ///returning plane text token 
+}
 const User = mongoose.model('User', userSchema);
 module.exports = User;
+
+ 
