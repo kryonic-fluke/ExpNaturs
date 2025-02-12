@@ -8,6 +8,7 @@ const {
   UpdateUser,
   deleteUser,
   createUsers,
+  updateMe,
 } = require('./../controlers/userControlers.');
 const {
   signup,
@@ -22,8 +23,10 @@ router.post('/login', login);
  router.patch('/resetPassword/:token', resetPassword);
 
 
-router.patch('/updatePassword',protects, updatePassword)
+router.patch('/updatePassword',protects, updatePassword)   //protects make sure that user is loged in
 
+
+router.patch('/updateMe',protects,updateMe)
 router.route('/').get(getAllUsers).post(createUsers);
 
 router

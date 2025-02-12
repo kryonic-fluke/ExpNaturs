@@ -351,4 +351,7 @@ reset password : user sends a post request to forgot route m that will create a 
 then user sendsd the token from the email along with new password oinorder to update his password , 
 
 ----
-package node mailer
+package node mailer and mailtrap
+
+---------------
+we use different routes for updating password and updating user data such as email 
