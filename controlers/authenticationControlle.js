@@ -5,6 +5,7 @@ const User = require('./../models/usermodel');
 const crypto = require('crypto');
 const AppError = require('./utils/Apperror');
 const sendEmail = require('./utils/email');
+const bcrypt = require('bcryptjs')
 const changedpasswordAfter = require('./../models/usermodel');
 const catchasync = require('./utils/catchAsync');
 
@@ -13,6 +14,18 @@ const signToken = (id) => {
     expiresIn: process.env.JWT_EXPIRES_IN, //THIS IS A OPTION
   });
 };
+
+
+const createSendToken = (user,statusCode,res)=>{
+  const token = signToken(user._id);
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data:{
+      user
+    }
+  });
+}
 exports.signup = catchasync(async (req, res, next) => {
   //   console.log('request is hit');
   // console.log(req.body);
@@ -21,7 +34,7 @@ exports.signup = catchasync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
-    password: req.body.password,
+    password: req.body.password, 
     passwordConfirmation: req.body.passwordConfirmation,
     passwordChangedAt: req.body.passwordChangedAt,
     role: req.body.role,
@@ -29,15 +42,7 @@ exports.signup = catchasync(async (req, res, next) => {
   // const token= jwt.sign({id:newUser._id}, process.env.JWT_SECRET,{
   //   expiresIn:process.env.JWT_EXPIRES_IN         //THIS IS A OPTION
   // }) // we have th epayload, secret and the header is created automatically
-
-  const token = signToken(newUser._id);
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+createSendToken(newUser,201,res)
 });
 
 exports.login = catchasync(async (req, res, next) => {
@@ -52,11 +57,8 @@ exports.login = catchasync(async (req, res, next) => {
   // 3) If everything is okay, send toke n to client
 
   console.log('Authentication successful'); // Log to indicate success
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user,200,res)
+
 });
 
 exports.protects = catchasync(async function (req, res, next) {
@@ -178,11 +180,32 @@ exports.resetPassword =catchasync (async(req, res, next) => {
 
   //4) log the user in, send JWT
 
+  createSendToken(user,200,res)
 
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+ 
 });
+
+
+exports.updatePassword =catchasync(async (req,res,next)=>{
+  //1) get user from the collection
+ 
+  const user =await User.findById(req.user.id).select('+password');//
+  //2)check if posted current password is correct 
+  if(! await user.correctPassword(req.body.passwordCurrent,user.password))  return next (new AppError('enterted password was incorrect',401))
+
+  //3)if so, update password 
+  try {
+    user.password =req.body.password;
+    user.passwordConfirmation = req.body.passwordConfirmation;
+    await user.save();
+    res.status(200).json({ message: 'Password updated successfully' }); // Success response
+  } catch (error) {
+    console.error("Error updating password:", error); // Log the error for debugging
+    return new AppError('Error updating password. Please try again later.', 500); // Generic error message
+  }
+  //4) log the user in , send jwt 
+
+  createSendToken(user,200,res)
+    
+})
 

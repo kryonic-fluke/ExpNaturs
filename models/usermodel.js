@@ -66,6 +66,7 @@ userSchema.pre('save',function(next){
   this.passwordChangedAt  = Date.now()-1000;
 next();
 })
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
