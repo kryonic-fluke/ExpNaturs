@@ -355,3 +355,58 @@ package node mailer and mailtrap
 
 ---------------
 we use different routes for updating password and updating user data such as email 
+----------------------------------------------
+Security Best practises
+
+1) Compromised databse : attacker got access to the data base :
+ strongly encrypt password with salt and hash(bcrypt)
+ strongly encrypt password reset token (sha 256)
+
+2)Brute Force Attracks 
+
+ user bcrypt (to make login request slow)
+  implement rate limiting (express-rate-limit)
+  implement maximum login attempts
+
+3)CROSS-SITE SCRIPTING(XSS) ATTACKS
+
+  STORE JWT IN HTTPONLY COOKIES , never store json webtoken  in local strorage, by this browser can only send and receive the cookie but can not modify or change.
+  SANITIZE USER INPUT DATA
+  SET SPCIAL HTTP HEADERS (HELEMT PACKAGE)
+
+4)denial of server (dos) attack 
+implement rate limit
+limit body payload 
+avoid using evil regular expression
+
+
+5) nosql  query injection 
+
+use mongoose for mondodb (because of schema types)
+sanitize user input data
+
+always use https 
+create random password token , give them expiry data
+
+
+deny acces to jwt after the password change 
+ dont commit sensitive config to gi
+
+  do send error details to client 
+
+  prevent corss site request forgery (csurf package)
+
+  require re-authentucation begore a high-value action
+
+  implement a blaclist of untrusted jwt
+
+  confirm user email address after first creating account
+   
+   keep user logged in with refresh token 
+
+   implement two factor in with refresh token 
+
+  prevent  parameter polltuion causing uncaught expectation  
+
+  ----------------------------
+  cookie is a small peice of text that server can send to a client(browser) , after receiving it is automatically saved and sent back along with future request to the same server
