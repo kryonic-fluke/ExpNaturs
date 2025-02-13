@@ -7,12 +7,16 @@ const AppError = require('./controlers/utils/Apperror')
 const globalErrorHandler  =require('./controlers/errorControler')
 const userRouter = require('./router/userRoutes');
 const tourRouter = require('./router/tourRoutes');
+const helmet = require('helmet')
 const rateLimit  = require('express-rate-limit');
-// 1) GLOBAL Middleware
+// 1) GLOBAL Middleware, development loging
 if(process.env.NODE_ENV === "development"){
   app.use(morgan('dev')); // gives the info about the request in the console
 }
+//set security http headers
+app.use(helmet())
  
+//limit request from same api 
 const limiter = rateLimit({    //allows 100 request form the same ip  , helps prevent the app from getting attacked by brute force  
   max:3,
   windowMs:60*60*1000,    
@@ -20,14 +24,18 @@ const limiter = rateLimit({    //allows 100 request form the same ip  , helps pr
 })
 
 app.use('/api',limiter)     //affects all the route that has api
+//body parser, reading data from the body into req.body
+app.use(express.json({
+  limit:'10kb'
+})); // this is the middleware that can modify the incoming data, it stands between req and res, data from the body(property of a req) is added to it
 
-app.use(express.json()); // this is the middleware that can modify the incoming data, it stands between req and res, data from the body(property of a req) is added to it
+//serving static file 
 app.use(express.static(`${__dirname}/public`))
+
+//testing middleware 
 app.use((req,res,next)=>{
   req.requestTime  =new Date().toISOString();
   // console.log(req.headers);
-
-  
   next()
 })
 // app.use((req, res, next) => {

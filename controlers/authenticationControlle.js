@@ -8,7 +8,6 @@ const sendEmail = require('./utils/email');
 const bcrypt = require('bcryptjs')
 const changedpasswordAfter = require('./../models/usermodel');
 const catchasync = require('./utils/catchAsync');
-
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN, //THIS IS A OPTION
