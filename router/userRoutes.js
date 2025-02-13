@@ -1,7 +1,12 @@
 /*eslint-disable*/
+
 const express = require('express');
 const router = express.Router();
-const {forgotPassword,resetPassword,updatePassword} = require('./../controlers/authenticationControlle')
+const {
+  forgotPassword,
+  resetPassword,
+  updatePassword,
+} = require('./../controlers/authenticationControlle');
 const {
   getAllUsers,
   getAuser,
@@ -9,7 +14,8 @@ const {
   deleteUser,
   createUsers,
   updateMe,
-} = require('./../controlers/userControlers.');
+  deleteMe,
+} = require('./../controlers/userControlers');
 const {
   signup,
   login,
@@ -19,16 +25,21 @@ const {
 router.post('/signup', signup);
 router.post('/login', login);
 
- router.post('/forgotPassword',forgotPassword)
- router.patch('/resetPassword/:token', resetPassword);
+router.post('/forgotPassword', forgotPassword);
+router.patch('/resetPassword/:token', resetPassword);
+
+router.patch('/updatePassword', protects, updatePassword); //protects make sure that user is loged in
 
 
-router.patch('/updatePassword',protects, updatePassword)   //protects make sure that user is loged in
+router.patch('/updateMe', protects, updateMe);
+router.delete('/deleteMe', protects, deleteMe);
 
+// **Separate route for '/' path:**
+router.route('/')
+  .get(getAllUsers)
+  .post(createUsers);
 
-router.patch('/updateMe',protects,updateMe)
-router.route('/').get(getAllUsers).post(createUsers);
-
+// **Separate route for '/:id' path:**
 router
   .route('/:id')
   .get(getAuser)

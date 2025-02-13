@@ -1,6 +1,6 @@
 /* eslint-disable */
 process.on('uncaughtException', (err) => {
-  console.log('uncaughtException');
+  console.log(err);
   console.log(err.name, err.message);
   process.exit(1); // For uncaught exceptions, we can exit directly since no server exists yet
 });
@@ -17,9 +17,9 @@ mongoose
   .connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false,
+    useFindAndModify: false, 
   })
-  .then(() => {
+  .then(() => { 
     console.log('db connection successful');
   });
 

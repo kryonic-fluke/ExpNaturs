@@ -71,7 +71,7 @@ module.exports = (err, req, res, next) => {
     error.errors = err.errors;
 
     console.log(error);
-
+  
     if (error.name === 'CastError') {
       error = handleCastErrorDB(error); // Passes the error that Mongoose created to this function
       // The function should return a new error object with the operation set to true
