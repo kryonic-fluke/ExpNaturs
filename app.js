@@ -7,6 +7,8 @@ const AppError = require('./controlers/utils/Apperror')
 const globalErrorHandler  =require('./controlers/errorControler')
 const userRouter = require('./router/userRoutes');
 const tourRouter = require('./router/tourRoutes');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss  = require('xss-clean');
 const helmet = require('helmet')
 const rateLimit  = require('express-rate-limit');
 // 1) GLOBAL Middleware, development loging
@@ -18,7 +20,7 @@ app.use(helmet())
  
 //limit request from same api 
 const limiter = rateLimit({    //allows 100 request form the same ip  , helps prevent the app from getting attacked by brute force  
-  max:3,
+  max:20,
   windowMs:60*60*1000,    
   message:'Too many request from this Ip , please try again later'
 })
@@ -29,6 +31,11 @@ app.use(express.json({
   limit:'10kb'
 })); // this is the middleware that can modify the incoming data, it stands between req and res, data from the body(property of a req) is added to it
 
+//data sanitization against NoSql query injection
+
+app.use(mongoSanitize())
+//data sanitization against xxs(cross side scripting attacks)
+app.use(xss()) //prevents from html code getting injected containing js 
 //serving static file 
 app.use(express.static(`${__dirname}/public`))
 
