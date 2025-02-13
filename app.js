@@ -9,6 +9,7 @@ const userRouter = require('./router/userRoutes');
 const tourRouter = require('./router/tourRoutes');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss  = require('xss-clean');
+const hpp  =require('hpp')
 const helmet = require('helmet')
 const rateLimit  = require('express-rate-limit');
 // 1) GLOBAL Middleware, development loging
@@ -36,6 +37,17 @@ app.use(express.json({
 app.use(mongoSanitize())
 //data sanitization against xxs(cross side scripting attacks)
 app.use(xss()) //prevents from html code getting injected containing js 
+//prevent parameter pollution 
+app.use(hpp({
+  whitelist:[
+    'duration',
+    'ratingsQuantity',
+    'ratingsAverage',
+    'maxGroupSize',
+    'difficulty',
+    'price'
+  ]
+}))
 //serving static file 
 app.use(express.static(`${__dirname}/public`))
 
