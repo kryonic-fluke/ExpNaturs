@@ -58,7 +58,9 @@ createSendToken(newUser,201,res)
 });
 
 exports.login = catchasync(async (req, res, next) => {
+
   const { email, password } = req.body; // 1) Check if email and password actually exist
+
   if (!email || !password) {
     return next(new AppError('Please provide email and password!', 400)); // Correct: return next()
   } // 2) Check if user exists and password is correct

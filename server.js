@@ -5,8 +5,9 @@ process.on('uncaughtException', (err) => {
   process.exit(1); // For uncaught exceptions, we can exit directly since no server exists yet
 });
 
-const mongoose = require('mongoose'); 
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+
 dotenv.config({ path: './confige.env' });
 
 const app = require('./app');
@@ -17,9 +18,9 @@ mongoose
   .connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false, 
+    useFindAndModify: false,
   })
-  .then(() => { 
+  .then(() => {
     console.log('db connection successful');
   });
 
@@ -29,8 +30,7 @@ const server = app.listen(port, () => {
   console.log(`app running on port ${port}...`);
 });
 
-
-process.on('unhandledRejection', err => {
+process.on('unhandledRejection', (err) => {
   console.log(err.name, err.message);
   console.log('Unhandled rejection');
   server.close(() => {

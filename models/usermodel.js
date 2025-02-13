@@ -66,6 +66,7 @@ const userSchema = new mongoose.Schema({
 });
 userSchema.pre(/^find/, function(next) {
   this.find({ active: { $ne: false } }); 
+  next()
 });
 
 userSchema.pre('save',function(next){

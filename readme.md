@@ -410,3 +410,11 @@ deny acces to jwt after the password change
 
   ----------------------------
   cookie is a small peice of text that server can send to a client(browser) , after receiving it is automatically saved and sent back along with future request to the same server
+
+
+  =======================
+  implementing  rate limmiter using package express-rate-limit 
+
+   limiter   creates 2 headers , limit and remaining 
+ 
+
