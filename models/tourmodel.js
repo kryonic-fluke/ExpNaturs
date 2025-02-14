@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
-
+const User  = require('./usermodel')
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -22,10 +22,6 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       default: 4.5,
       required: [true, 'A tour must have a rating'],
-    },
-    price: {
-      type: Number,
-      required: [true, 'A tour must have a price'],
     },
     duration: {
       type: Number,
@@ -102,11 +98,46 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       default: false,
     },
+
+    startLocation:{
+      //geojson to specify geospatical data 
+      type:{
+          type:String,
+          default:'Point',
+          enum:['Point'],
+          
+      },
+      coordinate:[Number] , //number is cordiantes of point, longitude then latitude
+      address:String,
+      description:String
+    },
+
+    locations:[   //creating embedded documents using array , inside array new documents are entered 
+     { 
+      type:{type:{String,
+        default:'Point',
+        enum:['Point'] 
+      },
+    },
+      coordinate:[Number],
+      addresss:String,
+      description:String,
+      day:Number,
+
+    
+    }
+
+
+
+    ],
+
+    guides:Array
   },
   {
     toJSON: { virtuals: true }, //to make virtuals visible
     toObject: { virtuals: true },
   },
+  
 );
 //this property will get created each time we get the data out of the databse
 //note this field can not be used for query, cause its not part of the database
@@ -140,6 +171,11 @@ tourSchema.pre(/^find/, function (next) {
   this.start = Date.now();
   next();
 });
+tourSchema.pre('save',async function(next){  //embedding the data  
+ const guidesPromises =await  this.guides.map(id=>User.findById(id))
+this.guides = await Promise.all(guidesPromises)  ///overriding guides
+ next();
+})     //problem here is that, if user whos id is paased changes its role or other thing , then we would have to refeltct that change in the tour doc aswell 
 
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`query took ${Date.now() - this.start}milliseconds`);

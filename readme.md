@@ -429,3 +429,59 @@ package express-mongo-sanatise  and xss-clean
 
 ---------
 preventing parameter pollution 
+------------------------------------------------------------------
+
+Data Modeling: Quick Guide to Referencing vs. Embedding
+
+Data modeling structures raw data into logical models.  A key decision, especially in NoSQL, is whether to reference or embed related data.
+
+1. Relationship Types: Understand how data connects:
+
+1:1 (One-to-One): One A to one B (e.g., User - UserProfile).
+1:Many (One-to-Many): One A to many B (e.g., Author - Books).
+1-to-Few: Few related Bs.
+1-to-Ton: Very many related Bs.
+Many-to-Many (N:M): Many A to many B (e.g., Movie - Actors).
+2. Referencing (Normalization): Separate & Link
+
+Concept: Store related data in separate collections, link using references (IDs).
+Analogy: "Authors" collection, "Books" collection, books link to authors by authorId.
+Pros: Less redundancy, consistency, flexible, good for independent queries.
+Cons: More complex queries for combined data, might need multiple queries for related info.
+3. Embedding (Denormalization): Combine Together
+
+Concept: Store related data within a single document.
+Analogy: "Books" collection, each book document includes author info inside.
+Pros: Faster reads for combined data, simpler queries for combined data.
+Cons: Redundancy, consistency issues, less flexible, harder to query embedded data alone.
+4. Choose Embedding or Referencing Based On:
+
+Relationship Type:
+1:1, 1-to-Few: Embedding often good.
+1-to-Many, Many-to-Many: Referencing usually better (especially if "many" side is large).
+Query Patterns:
+Often need combined data? Embedding might be faster.
+Often query entities separately? Referencing better.
+Application Type:
+Read-heavy: Favor embedding for speed.
+Write-heavy: Favor referencing for easier updates.
+Data Size: Avoid embedding too much data in one doc (document size limits).
+5. Types of Referencing (if you choose referencing):
+
+Child Referencing (Parent to Children): Parent document holds array of child IDs.
+Best for: 1-to-Few, when you access parent and its children.
+Limit: Array size limits if too many children.
+Parent Referencing (Child to Parent): Child document holds parent ID.
+Best for: 1-to-Many, when you start with child and need parent.
+Limit: Less efficient to find all children of a parent.
+Two-Way Referencing (Both to Both): Both parent and child have each other's IDs (for Many-to-Many).
+Best for: Many-to-Many, need to navigate in both directions.
+Complex: Harder to manage consistency.
+
+-----------------------------------------------
+
+tours , locations, bookings both are normalized 
+
+ users , reviews
+ ---------------------------------------------- 
+ location data will be embeded in to tours
