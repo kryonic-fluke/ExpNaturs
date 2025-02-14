@@ -485,3 +485,7 @@ tours , locations, bookings both are normalized
  users , reviews
  ---------------------------------------------- 
  location data will be embeded in to tours
+
+ -------------------------
+
+ virtual populate : Virtual populate in Mongoose allows you to access documents from another collection that are related to your current document, but without actually storing an array of IDs in your current document itself. 

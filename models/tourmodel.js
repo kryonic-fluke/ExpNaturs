@@ -129,10 +129,14 @@ const tourSchema = new mongoose.Schema(
         ref: 'User',
       },
     ],
+
+   
   },
   {
     toJSON: { virtuals: true }, //to make virtuals visible
     toObject: { virtuals: true },
+  
+
   },
 );
 //this property will get created each time we get the data out of the databse
@@ -140,6 +144,12 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
+//virtual populate
+tourSchema.virtual('tourReviews',{
+  ref:'Review',
+  foreignField:'tour',   //name of reference of tour in review modal 
+  localField:'_id'    // this tour called in local model
+})
 
 tourSchema.pre(/^find/, function (next) {
   //to populate the fields guide
