@@ -11,7 +11,7 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = catchasync(async (req, res) => {
+exports.getAllTours = catchasync(async (req, res, next) => {
   //Execute the query
   console.log('request hit ');
 
@@ -50,7 +50,7 @@ exports.CreateNewTour = catchasync(async (req, res, next) => {
   res.status(201).json({
     status: 'success',
     data: {
-      tourS: newTour,
+      tours: newTour,
     },
   });
 });

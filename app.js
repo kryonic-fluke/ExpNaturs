@@ -12,6 +12,8 @@ const xss  = require('xss-clean');
 const hpp  =require('hpp')
 const helmet = require('helmet')
 const rateLimit  = require('express-rate-limit');
+
+const reviewRouter = require('./router/reviewRoutes')
 // 1) GLOBAL Middleware, development loging
 if(process.env.NODE_ENV === "development"){
   app.use(morgan('dev')); // gives the info about the request in the console
@@ -70,6 +72,9 @@ app.use((req,res,next)=>{
 app.use('/api/v1/tours', tourRouter); // tourRouter is a middleware that will be used for the specified route
 // request goes into middleware stack, and matches the specified url, then function will run
 app.use('/api/v1/users', userRouter);
+
+app.use('/api/v1/reviews', reviewRouter);
+
 
 //if we able to reach this point , indicates that , no valid route is called (middleware cycle is not finished)
 app.all('*',((req,res,next)=>{ //all will run for all the verbs in the  http methods
