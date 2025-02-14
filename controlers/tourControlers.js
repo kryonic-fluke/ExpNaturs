@@ -33,7 +33,7 @@ exports.getAllTours = catchasync(async (req, res) => {
 });
 
 exports.getATour = catchasync(async (req, res,next) => {
-  const tours = await Tour.findById(req.params.id);
+  const tours = await Tour.findById(req.params.id)
   if(!tours){
     return next(new AppError('No tour found with that Id', 404))
   }

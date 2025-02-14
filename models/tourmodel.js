@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
-const User  = require('./usermodel')
+// const User  = require('./usermodel')
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -14,7 +14,7 @@ const tourSchema = new mongoose.Schema(
       maxlength: [40, 'A tour name must have less than or equal 40 characters'],
       minlength: [10, 'A tour name must have more than or equal 10 characters'],
       // validator:[validator.isAlpha,'Tour name will only contain character']
-    },  
+    },
 
     slug: String,
 
@@ -42,7 +42,7 @@ const tourSchema = new mongoose.Schema(
       },
     },
 
-    ratingsAverage:{
+    ratingsAverage: {
       type: Number,
       rdefault: 0,
       min: [1, 'Rating must be above 1.0'], //min and max validators also work for dates
@@ -62,11 +62,12 @@ const tourSchema = new mongoose.Schema(
     priceDiscount: {
       type: Number,
       validate: {
-        validator: function (val) {   //this points only to the document that is being created , not existing 
+        validator: function (val) {
+          //this points only to the document that is being created , not existing
           //custom validator
           return val < this.price;
         },
-        message: 'Discount price ({VALUE}) should be below the regular price',   //VALUE has the access to the value that was inputed(val)
+        message: 'Discount price ({VALUE}) should be below the regular price', //VALUE has the access to the value that was inputed(val)
       },
     },
 
@@ -99,45 +100,40 @@ const tourSchema = new mongoose.Schema(
       default: false,
     },
 
-    startLocation:{
-      //geojson to specify geospatical data 
-      type:{
-          type:String,
-          default:'Point',
-          enum:['Point'],
-          
+    startLocation: {
+      //geojson to specify geospatical data
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
       },
-      coordinate:[Number] , //number is cordiantes of point, longitude then latitude
-      address:String,
-      description:String
+      coordinate: [Number], //number is cordiantes of point, longitude then latitude
+      address: String,
+      description: String,
     },
 
-    locations:[   //creating embedded documents using array , inside array new documents are entered 
-     { 
-      type:{type:{String,
-        default:'Point',
-        enum:['Point'] 
+    locations: [
+      //creating embedded documents using array , inside array new documents are entered
+      {
+        type: { type: { String, default: 'Point', enum: ['Point'] } },
+        coordinate: [Number],
+        addresss: String,
+        description: String,
+        day: Number,
       },
-    },
-      coordinate:[Number],
-      addresss:String,
-      description:String,
-      day:Number,
-
-    
-    }
-
-
-
     ],
 
-    guides:Array
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true }, //to make virtuals visible
     toObject: { virtuals: true },
   },
-  
 );
 //this property will get created each time we get the data out of the databse
 //note this field can not be used for query, cause its not part of the database
@@ -145,6 +141,14 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+tourSchema.pre(/^find/, function (next) {
+  //to populate the fields guide
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+  next();
+});
 //pre runs before .save and .create (), documents middleware ,
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true }); // middleware has the access to currently saved middleware this points to the currently processing document
@@ -171,11 +175,14 @@ tourSchema.pre(/^find/, function (next) {
   this.start = Date.now();
   next();
 });
-tourSchema.pre('save',async function(next){  //embedding the data  
- const guidesPromises =await  this.guides.map(id=>User.findById(id))
-this.guides = await Promise.all(guidesPromises)  ///overriding guides
- next();
-})     //problem here is that, if user whos id is paased changes its role or other thing , then we would have to refeltct that change in the tour doc aswell 
+
+// -----------
+// tourSchema.pre('save',async function(next){  //embedding the data
+//  const guidesPromises =await  this.guides.map(id=>User.findById(id))
+// this.guides = await Promise.all(guidesPromises)  ///overriding guides
+//  next();
+// })     //problem here is that, if user whos id is paased changes its role or other thing , then we would have to refeltct that change in the tour doc aswell
+//--------------
 
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`query took ${Date.now() - this.start}milliseconds`);
