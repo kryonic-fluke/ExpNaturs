@@ -7,15 +7,17 @@ const {
   deleteReview,
   UpdateReview,
   setTourUserIds,
-  getReview
+  getReview,
 } = require('../controlers/reviewController');
-const {protects, restrictTo} = require('./../controlers/authenticationControlle');
-const router = express.Router({mergeParams:true}); // when this reviewRouter is mounted, inherit (merge) any route parameters that were defined in the path where it's being mounted.'
+const {
+  protects,
+  restrictTo,
+} = require('./../controlers/authenticationControlle');
+const router = express.Router({ mergeParams: true }); // when this reviewRouter is mounted, inherit (merge) any route parameters that were defined in the path where it's being mounted.'
 router
   .route('/')
   .get(getAllReviews)
-  .post(protects,restrictTo('user'),setTourUserIds, createReview);
+  .post(protects, restrictTo('user'), setTourUserIds, createReview);
 
-
-  router.route('/:id').delete(deleteReview).patch(UpdateReview).get(getReview)
-module.exports = router; 
+router.route('/:id').delete(deleteReview).patch(UpdateReview).get(getReview);
+module.exports = router;

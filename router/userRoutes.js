@@ -17,6 +17,7 @@ const {
   createUser,
   updateMe,
   deleteMe,
+  getMe,
 } = require('./../controlers/userControlers');
 const {
   signup,
@@ -35,6 +36,7 @@ router.patch('/updatePassword', protects, updatePassword); //protects make sure 
 
 router.patch('/updateMe', protects, updateMe);
 router.delete('/deleteMe', protects, deleteMe);
+router.get('/me', protects, getMe,getAuser);
 
 // **Separate route for '/' path:**
 router.route('/')

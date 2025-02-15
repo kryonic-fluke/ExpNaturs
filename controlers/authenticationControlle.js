@@ -76,6 +76,8 @@ exports.login = catchasync(async (req, res, next) => {
 
 exports.protects = catchasync(async function (req, res, next) {
   //1)getting token and check of it's there
+  console.log(req);
+  
   let token;
 
   if (

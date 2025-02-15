@@ -15,18 +15,23 @@ const filterObj = (obj,...allowedFields)=>{
   });
   return newObj
 }
-exports.getAllUsers = catchAsync(async(req, res,next) => {
- const   user = await User.find();
-  //SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    results: user.length,
-    data: {
-      user,
-    }, 
-  });
-  });
+// exports.getAllUsers = catchAsync(async(req, res,next) => {
+//  const   user = await User.find();
+//   //SEND RESPONSE
+//   res.status(200).json({
+//     status: 'success',
+//     results: user.length,
+//     data: {
+//       user,
+//     }, 
+//   });
+//   });
 
+
+  exports.getMe = (req,res,next)=>{
+    req.params.id= req.user.id;   
+    next();
+  }
   exports.updateMe= catchAsync(async(req,res,next)=>{
     //1) create error if user POSTS password data
      if(req.body.password ||req.body.passwordConfirmation) {
@@ -66,6 +71,8 @@ exports.getAllUsers = catchAsync(async(req, res,next) => {
       message: 'this route is not yet defined Plese use signup instead',
     });
   };
+
+
   exports.getAllUsers = factory.getAllOne(User)
 
   exports.getAuser = factory.getOne(User)
