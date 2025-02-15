@@ -108,7 +108,6 @@ exports.protects = catchasync(async function (req, res, next) {
       new AppError('user recently changed password!Please login again.', 401),
     );
   }
-
   // after all this auth user will get the access to the protected route
   req.user = currentUser;
   next();
@@ -129,6 +128,7 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
 
 exports.forgotPassword = catchasync(async (req, res, next) => {
   // 1) get user based on Posted email

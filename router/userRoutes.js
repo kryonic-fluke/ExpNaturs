@@ -2,10 +2,12 @@
 
 const express = require('express');
 const router = express.Router();
+
 const {
   forgotPassword,
   resetPassword,
   updatePassword,
+  restrictTo,
 } = require('./../controlers/authenticationControlle');
 const {
   getAllUsers,
@@ -39,10 +41,13 @@ router.route('/')
   .get(getAllUsers)
   .post(createUsers);
 
-// **Separate route for '/:id' path:**
-router
+  router
   .route('/:id')
   .get(getAuser)
   .patch(UpdateUser)
   .delete(protects, deleteUser);
+// **Separate route for '/:id' path:**
+
 module.exports = router;
+
+

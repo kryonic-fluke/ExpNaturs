@@ -6,8 +6,7 @@ const {
   createReview,
 } = require('../controlers/reviewController');
 const {protects, restrictTo} = require('./../controlers/authenticationControlle');
-const router = express.Router();
-
+const router = express.Router({mergeParams:true}); // when this reviewRouter is mounted, inherit (merge) any route parameters that were defined in the path where it's being mounted.'
 router
   .route('/')
   .get(getAllReviews)
