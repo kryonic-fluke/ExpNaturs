@@ -60,7 +60,7 @@ exports.getAllUsers = catchAsync(async(req, res,next) => {
   })
 
 
-  exports.createUsers = (req, res) => {
+  exports.createUser = (req, res) => {
     res.status(500).json({ 
       status: 'error',
       message: 'this route is not yet defined',
@@ -74,12 +74,13 @@ exports.getAllUsers = catchAsync(async(req, res,next) => {
     });
   };
   
-  exports.UpdateUser = (req, res) => {
-    res.status(500).json({
-      status: 'error',
-      message: 'this route is not yet defined',
-    });
-  };
+  exports.UpdateUser = factory.updateOne(User)
+  // (req, res) => {
+  //   res.status(500).json({
+  //     status: 'error',
+  //     message: 'this route is not yet defined',
+  //   });
+  // };
   
   exports.deleteUser =factory.deletOne(User)
   

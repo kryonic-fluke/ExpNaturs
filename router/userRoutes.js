@@ -14,7 +14,7 @@ const {
   getAuser,
   UpdateUser,
   deleteUser,
-  createUsers,
+  createUser,
   updateMe,
   deleteMe,
 } = require('./../controlers/userControlers');
@@ -39,7 +39,7 @@ router.delete('/deleteMe', protects, deleteMe);
 // **Separate route for '/' path:**
 router.route('/')
   .get(getAllUsers)
-  .post(createUsers);
+  .post(createUser);
 
   router
   .route('/:id')
