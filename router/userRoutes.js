@@ -45,7 +45,7 @@ router.route('/')
   .route('/:id')
   .get(getAuser)
   .patch(UpdateUser)
-  .delete(protects, deleteUser);
+  .delete( deleteUser);
 // **Separate route for '/:id' path:**
 
 module.exports = router;
