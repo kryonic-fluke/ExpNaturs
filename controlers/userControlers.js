@@ -63,16 +63,12 @@ exports.getAllUsers = catchAsync(async(req, res,next) => {
   exports.createUser = (req, res) => {
     res.status(500).json({ 
       status: 'error',
-      message: 'this route is not yet defined',
+      message: 'this route is not yet defined Plese use signup instead',
     });
   };
-  
-  exports.getAuser = (req, res) => {
-    res.status(500).json({
-      status: 'error',
-      message: 'this route is not yet defined',
-    });
-  };
+  exports.getAllUsers = factory.getAllOne(User)
+
+  exports.getAuser = factory.getOne(User)
   
   exports.UpdateUser = factory.updateOne(User)
   // (req, res) => {

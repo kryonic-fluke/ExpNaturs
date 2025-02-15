@@ -6,7 +6,8 @@ const {
   createReview,
   deleteReview,
   UpdateReview,
-  setTourUserIds
+  setTourUserIds,
+  getReview
 } = require('../controlers/reviewController');
 const {protects, restrictTo} = require('./../controlers/authenticationControlle');
 const router = express.Router({mergeParams:true}); // when this reviewRouter is mounted, inherit (merge) any route parameters that were defined in the path where it's being mounted.'
@@ -16,5 +17,5 @@ router
   .post(protects,restrictTo('user'),setTourUserIds, createReview);
 
 
-  router.route('/:id').delete(deleteReview).patch(UpdateReview)
+  router.route('/:id').delete(deleteReview).patch(UpdateReview).get(getReview)
 module.exports = router; 
