@@ -13,11 +13,14 @@ const {
   protects,
   restrictTo,
 } = require('./../controlers/authenticationControlle');
+
+
 const router = express.Router({ mergeParams: true }); // when this reviewRouter is mounted, inherit (merge) any route parameters that were defined in the path where it's being mounted.'
+router.use(protects);
 router
   .route('/')
   .get(getAllReviews)
-  .post(protects, restrictTo('user'), setTourUserIds, createReview);
+  .post( restrictTo('user'), setTourUserIds, createReview);
 
-router.route('/:id').delete(deleteReview).patch(UpdateReview).get(getReview);
+router.route('/:id').delete(restrictTo('user','admin'),deleteReview).patch(restrictTo('user','admin'),UpdateReview).get(getReview);
 module.exports = router;
