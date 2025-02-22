@@ -141,6 +141,10 @@ const tourSchema = new mongoose.Schema(
 );
 //this property will get created each time we get the data out of the databse
 //note this field can not be used for query, cause its not part of the database
+
+// tourSchema.index({price:1}) //setting a sinle field index ,here 1 means creating accending index for price
+tourSchema.index({price:1,ratingsAverage:-1}); //setting a sinle field index ,here 1 means creating accending index for price
+tourSchema.index({slug:1});
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });

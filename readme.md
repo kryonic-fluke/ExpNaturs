@@ -492,3 +492,8 @@ tours , locations, bookings both are normalized
 
  ---------
  me Endpoint => where user can retrieve his own data 
+ ---------------------
+
+ setting indexes on the field , that we frequently query , help mono reduce the number of document it has to search , hence making it efficent /some indeces are set by mono itself like on id field or a unique field, and other can be set by us 
+
+ for quering single field alone we can use signle field index

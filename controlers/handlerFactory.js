@@ -73,6 +73,7 @@ exports.updateOne = (
       .sort()
       .limitFields()
       .paginate();
+    // const doc = await features.query.explain(); It provides detailed information about the query execution processIt provides detailed information about the query execution process
     const doc = await features.query;
     
     //SEND RESPONSE
