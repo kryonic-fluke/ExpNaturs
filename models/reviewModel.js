@@ -1,7 +1,7 @@
 /*eslint-disable*/
 
 const mongoose = require('mongoose');
-
+const Tour = require('./tourmodel')
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -57,7 +57,38 @@ reviewSchema.pre('find', function (next) {
   next();
 })
 
+reviewSchema.statics.calcAverageRatings = async function(tourId){  // here this points to model, static method to create a statistic about reviews of a tour
+ const stats=  await this.aggregate([
+    {
+      $match:{tour:tourId}
+    },
+    {
+      $group :{
+        _id:'$tour',
+        nRating:{$sum:1},
+        avgRating:{$avg:'$rating'},
+
+      }
+    }
+  ])
+  // console.log(stats);
+ await  Tour.findByIdAndUpdate(tourId,{
+    ratingsQuantity:stats[0].nRating,
+
+    ratingsAverage:stats[0].avgRating
+  })
+}
+
+
+reviewSchema.post('save',function(){
+  //this points to current review 
+  this.constructor.calcAverageRatings(this.tour); //tour here is the id ,here constructor will be review model 
+  console.log('this is ', this );
+  
+})
+
 const Review = mongoose.model('Review', reviewSchema);
+
 
 
 module.exports = Review;
