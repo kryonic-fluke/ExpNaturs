@@ -47,6 +47,7 @@ const tourSchema = new mongoose.Schema(
       rdefault: 0,
       min: [1, 'Rating must be above 1.0'], //min and max validators also work for dates
       max: [5, 'Rating must be below 5.0'],
+      set:val=>Math.round(val *10)/10 //runs each time there is a value for ratingsAverage
     },
 
     ratingsQuantity: {
