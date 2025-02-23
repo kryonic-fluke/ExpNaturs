@@ -23,7 +23,7 @@ app.use(helmet())
  
 //limit request from same api 
 const limiter = rateLimit({    //allows 100 request form the same ip  , helps prevent the app from getting attacked by brute force  
-  max:20,
+  max:100,
   windowMs:60*60*1000,    
   message:'Too many request from this Ip , please try again later'
 })

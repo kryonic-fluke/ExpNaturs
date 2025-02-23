@@ -1,7 +1,7 @@
 /*eslint-disable*/
 
 const mongoose = require('mongoose');
-const Tour = require('./tourmodel')
+const Tour = require('./tourmodel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -23,14 +23,14 @@ const reviewSchema = new mongoose.Schema(
     tour: {
       type: mongoose.Schema.ObjectId,
       ref: 'Tour',
-      select:'name',
+      select: 'name',
       required: [true, 'Review must being to a tour.'],
     },
 
     user: {
-      type: mongoose.Schema.ObjectId,   
+      type: mongoose.Schema.ObjectId,
       ref: 'User',
-      select:'name',
+      select: 'name',
       required: [true, 'review must belong to a user'],
     },
   },
@@ -39,7 +39,6 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
-
 
 reviewSchema.pre('find', function (next) {
   //   this.populate({
@@ -50,48 +49,70 @@ reviewSchema.pre('find', function (next) {
   //       select: 'name photo',
   //   });
   // next();
-      this.populate({
-        path: 'user',
-        select: 'name photo',
-    });
+  this.populate({
+    path: 'user',
+    select: 'name photo',
+  });
   next();
-})
+});
 
-reviewSchema.statics.calcAverageRatings = async function(tourId){  // here this points to model, static method to create a statistic about reviews of a tour
- const stats=  await this.aggregate([
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  // here this points to model, static method to create a statistic about reviews of a tour
+  const stats = await this.aggregate([
     {
-      $match:{tour:tourId}
+      $match: { tour: tourId }, //Filters the reviews to only include those that belong to the specified tourId.
     },
     {
-      $group :{
-        _id:'$tour',
-        nRating:{$sum:1},
-        avgRating:{$avg:'$rating'},
-
-      }
-    }
-  ])
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
   // console.log(stats);
- await  Tour.findByIdAndUpdate(tourId,{
-    ratingsQuantity:stats[0].nRating,
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      //here stats are assigned to respective fields in the tour model
+      ratingsQuantity: stats[0].nRating,
 
-    ratingsAverage:stats[0].avgRating
-  })
-}
+      ratingsAverage: stats[0].avgRating,
+    }); 
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
 
+      ratingsAverage: 0,
+    });
+  }
+};
 
-reviewSchema.post('save',function(){
-  //this points to current review 
-  this.constructor.calcAverageRatings(this.tour); //tour here is the id ,here constructor will be review model 
-  console.log('this is ', this );
-  
-})
+reviewSchema.post('save', function () {
+  //calling the aggregate function, after saveing the newly crearted document
+  //this points to current review
+  this.constructor.calcAverageRatings(this.tour); //tour here is the id ,here constructor will be review model
+});
+
+//problem with findByIdAndDelete is , this doestn't have the access to document middleware
+//using a trick yo get over this problem
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  // for queries that dont have the access to ducument middleware , we run this middleware , cause under the hood they are findOne
+  const query = this.getQuery(); // Get the query conditions for findOneAnd
+  this.r = await this.model.findOne(query); //saving the doc
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function () {
+  // await this.findOne(), Note :: we can get the access to the review doc doing this , cause query is alredu executed
+  if (this.r) {
+    await this.r.constructor.calcAverageRatings(this.r.tour);
+  } else {
+    console.error('Document not found in post middleware!');
+  }
+});
 
 const Review = mongoose.model('Review', reviewSchema);
 
-
-
 module.exports = Review;
- 
 
 //Post / tour/id/reviews
