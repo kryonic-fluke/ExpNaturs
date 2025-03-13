@@ -9,6 +9,7 @@ const {
   aliasTopTours,
   getTourStats,
   getMonthlyPlan,
+  getToursWithin
 } = require('./../controlers/tourControlers');
 
 const { createReview } = require('./../controlers/reviewController');
@@ -28,6 +29,10 @@ const router = express.Router();
 //   .post(protects, restrictTo('user'), createReview);  it can be implemented like this ,but its kinda messy
 
 router.use('/:tourId/reviews', reviewRouter);
+
+
+router.route('/tours-within/:distance/center/:latlng/unit/:unit').get(getToursWithin);
+//
 router
   .route('/')
   .get(getAllTours)
