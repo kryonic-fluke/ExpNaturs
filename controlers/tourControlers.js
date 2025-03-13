@@ -178,3 +178,38 @@ res.status(200).json({
 })
 
 })
+
+exports.getDistances=catchAsync(async(req,res,next)=>{
+  const  {latlng,unit}=req.params;
+  const [lat,lng]= latlng.split(',');
+
+  const multiplier =  'mi'? 0.00062137 : 0.001;
+  if(!lat || !lng){
+    next(new AppError('plese provide latitude and longitiude in the format lat, lng.',400))
+  }
+  const distance  =await Tour.aggregate([
+    {
+      $geoNear:{
+        near:{
+          type:'Point',
+          coordinates:[lng*1,lat*1]
+        },
+        distanceField:'distance',
+        distanceMultiplier:multiplier
+      }
+    },
+    {
+      $project:{
+        distance:1, //1 means want to keep the data
+        name:1
+      }
+    }
+  ]);
+
+  res.status(200).json({
+    status:'success',
+    data:{ 
+      data:distance
+    }
+  })
+})

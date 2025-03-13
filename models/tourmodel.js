@@ -208,12 +208,11 @@ tourSchema.post(/^find/, function (docs, next) {
 
 //aggregation mddleware happens before and after aggregation happens
 
-tourSchema.pre('aggregate', function (next) {
-  //here this points to current aggrgation object
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); //to indlue a filter to aggregate, that excludes secretTour
-  console.log(this.pipeline());
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   //here this points to current aggrgation object
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); //to indlue a filter to aggregate, that excludes secretTour
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;

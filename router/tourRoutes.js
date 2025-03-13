@@ -10,6 +10,7 @@ const {
   getTourStats,
   getMonthlyPlan,
   getToursWithin
+  ,getDistances
 } = require('./../controlers/tourControlers');
 
 const { createReview } = require('./../controlers/reviewController');
@@ -33,6 +34,8 @@ router.use('/:tourId/reviews', reviewRouter);
 
 router.route('/tours-within/:distance/center/:latlng/unit/:unit').get(getToursWithin);
 //
+
+router.route('/distances/:latlng/unit/:unit').get(getDistances);
 router
   .route('/')
   .get(getAllTours)
@@ -55,3 +58,4 @@ module.exports = router;
 //POST /TOUR/234WWE/REVIEWS
 //GET /tour/23242d2/reviews
 //GET /tour/23d232/reiews/23ee2
+
