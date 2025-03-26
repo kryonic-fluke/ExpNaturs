@@ -1,40 +1,36 @@
-/*eslint-disable*/
-
+/* eslint-disable */
 const AppError = require('./utils/Apperror');
 
+// --- Handler functions remain the same ---
 const handleCastErrorDB = (err) => {
-  const message = `Invalid ${err.path} : ${err.value}`;
-  return new AppError(message, 400); //so we converted a mongoose error in nicely formated operational error
+  const message = `Invalid ${err.path}: ${err.value}`;
+  return new AppError(message, 400);
 };
 
-const handleDuplicateFeildDB = (err) => {
-  const errors = Object.values(err.errors).map((el) => el.message);
-  console.log(errors);
-
-  // Create a comprehensive error message
-  const message = `Invalid input data. ${errors.join('. ')}`;
-
-  // Return a new operational error with 400 status (Bad Request)
+const handleDuplicateFieldDB = (err) => {
+  // Extract value from the error message for better feedback
+  const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+  const message = `Duplicate field value: ${value}. Please use another value!`;
   return new AppError(message, 400);
 };
 
 const handleValidationErrorDB = (err) => {
-  const errors = Object.keys(err.errors).map((key) => {
-    // Directly access the message property
-    return err.errors[key].message;
-  });
-  console.log(errors);
-
+  const errors = Object.values(err.errors).map((el) => el.message);
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
 
+const handleJWTError = () => 
+  new AppError('Invalid token. Please log in again!', 401);
 
-const handlTokenExpiredError = () => {return new AppError('server timeout, pls login again',401)}
-const handleJsonwebtokenError= ()=>{
-return  new AppError('Invalid token please login again!',401)
-}
+const handleJWTExpiredError = () => 
+  new AppError('Your token has expired! Please log in again.', 401);
+// ---------------------------------------
+
+
 const sendErrorDev = (err, res) => {
+  // Log the full error in development
+  console.error('DEV ERROR 💥', err);
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
@@ -43,56 +39,48 @@ const sendErrorDev = (err, res) => {
   });
 };
 
-const sendErrorProduction = (err, res) => {
+const sendErrorProd = (err, res) => { 
+  // A) Operational, trusted error: send message to client
   if (err.isOperational) {
     res.status(err.statusCode).json({
-      //user facing
       status: err.status,
       message: err.message,
     });
+  // B) Programming or other unknown error: don't leak error details
   } else {
-    console.error('Error💥', err);
+    // 1) Log error for developer
+    console.error('PRODUCTION ERROR 💥', err);
 
+    // 2) Send generic message
     res.status(500).json({
       status: 'error',
-      message: "something really got fkd",
+      message: 'Something went very wrong!', // More user-friendly message
     });
   }
 };
+
+
 module.exports = (err, req, res, next) => {
-  // console.log(err.stack);  //stack shows where error happened
+  // Set defaults if not already present (e.g., from non-AppError errors)
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'error';
 
-  err.statusCode = err.statusCode || 500; // Default to 500 if statusCode isn't set
-  err.status = err.status || 'error'; // Default to 'error' if status isn't set
-  if (process.env.NODE_ENV === 'production') {
-    let error = JSON.parse(JSON.stringify(err)); // Creating a shallow copy of the err object
-    error.name = err.name;
-    error.message = err.message;
-    error.errors = err.errors;
-
-    console.log(error);
-  
-    if (error.name === 'CastError') {
-      error = handleCastErrorDB(error); // Passes the error that Mongoose created to this function
-      // The function should return a new error object with the operation set to true
-    }
-    if (error.code === 11000) {
-      error = handleDuplicateFeildDB(error)
-    };
-
-    if (error.name === 'ValidationError') {
-      error = handleValidationErrorDB(error, res);
-    
-    }
-  if(error.name === 'TokenExpiredError')error =handlTokenExpiredError(error)
-
-    if(error.name==='JsonWebTokenError') error  = handleJsonwebtokenError(error)
-
-    sendErrorProduction(error, res); // Sending the error response in production
-  }
-
-  else { 
+  if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
-}
+
+  } else if (process.env.NODE_ENV === 'production') {
+    // Create a variable to hold the potentially transformed error
+    // IMPORTANT: Work with the original 'err' or create NEW AppErrors, avoid flawed cloning.
+    let errorToSend = err;
+
+    // Check for specific Mongoose/JWT errors and transform them into operational AppErrors
+    if (err.name === 'CastError') errorToSend = handleCastErrorDB(err);
+    if (err.code === 11000) errorToSend = handleDuplicateFieldDB(err); // Note: errmsg format might vary
+    if (err.name === 'ValidationError') errorToSend = handleValidationErrorDB(err);
+    if (err.name === 'JsonWebTokenError') errorToSend = handleJWTError();
+    if (err.name === 'TokenExpiredError') errorToSend = handleJWTExpiredError();
+
+    // After potential transformation, send the response based on operational status
+    sendErrorProd(errorToSend, res);
+  }
 };
- 
