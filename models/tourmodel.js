@@ -77,7 +77,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
     },
 
-    decription: {
+    description: {
       type: String,
       trim: true,
     },
@@ -202,7 +202,6 @@ tourSchema.pre(/^find/, function (next) {
 
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`query took ${Date.now() - this.start}milliseconds`);
-  console.log(docs);
   next();
 });
 

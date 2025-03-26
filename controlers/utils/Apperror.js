@@ -1,7 +1,7 @@
 /*eslint-disable*/
 class AppError extends Error{
 constructor(message,statusCode){
-    console.log('constructor is hit ');
+    
     
     super(message);  //calling parent's contructor , calling this sets the message property to message
     this.statusCode=statusCode;

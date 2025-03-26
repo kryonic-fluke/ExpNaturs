@@ -25,6 +25,7 @@ const {
   protects,
 } = require('./../controlers/authenticationControlle');
 
+
 router.post('/signup', signup);
 router.post('/login', login);
 

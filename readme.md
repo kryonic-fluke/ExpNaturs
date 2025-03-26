@@ -497,3 +497,12 @@ tours , locations, bookings both are normalized
  setting indexes on the field , that we frequently query , help mono reduce the number of document it has to search , hence making it efficent /some indeces are set by mono itself like on id field or a unique field, and other can be set by us 
 
  for quering single field alone we can use signle field index
+
+
+
+ -----------------------------------------------
+ time to render the website 
+ using template engine 
+   using pug here , some other are handlebar , eds
+
+using app.set('view engine, 'pug')

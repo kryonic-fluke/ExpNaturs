@@ -17,7 +17,7 @@ const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DTA_PASSWORD);
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
-    useCreateIndex: true,
+    useCreateIndex: true, 
     useFindAndModify: false,
   })
   .then(() => {
@@ -25,10 +25,10 @@ mongoose
   });
 
 const port = process.env.PORT || 49200;
-
 const server = app.listen(port, () => {
   console.log(`app running on port ${port}...`);
 });
+
 
 process.on('unhandledRejection', (err) => {
   console.log(err);
