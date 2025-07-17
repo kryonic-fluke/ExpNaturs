@@ -21,7 +21,7 @@ mongoose
     useFindAndModify: false,
   })
   .then(() => {
-    console.log('db connection successful');
+    console.log('Crud databse is connected');
   });
 
 const port = process.env.PORT || 49200;

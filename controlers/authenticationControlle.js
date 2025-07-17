@@ -16,8 +16,7 @@ const signToken = (id) => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
-  
-  
+
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
@@ -76,32 +75,49 @@ exports.login = catchasync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
-exports.isLoggedin = catchasync(async function (req, res, next) {
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', { 
+    expires: new Date(0),         
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
+exports.isLoggedin = async function (req, res, next) {
   //only for rendered pages
 
   if (req.cookies.jwt) {
-    //this verifies the token 
-    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
-//chk if the user still exits 
+    //this verifies the token
+    try{
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET,
+    );
+    //chk if the user still exits
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
-      return next()
-     }
-//ckh if the  user changed their password 
-    if (currentUser.changedpasswordAfter(decoded.iat)) {
       return next();
     }
-    //there is a loggedin user , we provide the data of that user to pug template
-    console.log(currentUser.body);
-    res.locals.user=currentUser;
-   return next();
+    //ckh if the  user changed their password
+
+
+if (currentUser && currentUser.changedpasswordAfter(decoded.iat)) { 
+  return next(
+    new AppError('User recently changed password! Please login again.', 401),
+  );
+}
+    res.locals.user = currentUser;
+    return next();
   }
-  next();
-});
+  catch(err){
+    return next();
+  }
+}
+next();
+};
 
 exports.protects = catchasync(async function (req, res, next) {
   //1)getting token and check of it's there
-  // console.log(req.body);
 
   let token;
 
@@ -132,13 +148,14 @@ exports.protects = catchasync(async function (req, res, next) {
     );
   }
   //4 chk if user change password after token was issued
-  if (changedpasswordAfter(decoded.iat)) {
+  if (currentUser.changedpasswordAfter(decoded.iat)) {
     return next(
       new AppError('user recently changed password!Please login again.', 401),
     );
   }
   // after all this auth user will get the access to the protected route
   req.user = currentUser;
+  res.locals.user = currentUser;
   next();
 });
 
