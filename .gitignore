@@ -1,0 +1,20 @@
+# Node.js dependencies
+/node_modules
+/package-lock.json
+
+# Environment variables
+.env
+/confige.env
+
+# Build artifacts
+/dist
+.parcel-cache
+
+# Map files (if these are generated and not source)
+/map
+/mapBox
+app.js.map
+
+# Editor/IDE specific files
+.eslintrc.json
+.prettierrc
